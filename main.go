@@ -18,7 +18,7 @@ func main() {
 	}
 
 	// set up default path
-	http.HandleFunc("/", handleBadRequest)
+	http.HandleFunc("/", handleNotImplemented)
 
 	// start listening on port
 	fmt.Println("Listening on port " + port + "...")
@@ -30,7 +30,7 @@ func main() {
 	}
 }
 
-func handleBadRequest(res http.ResponseWriter, req *http.Request) {
-	status := http.StatusBadRequest
+func handleNotImplemented(res http.ResponseWriter, req *http.Request) {
+	status := http.StatusNotImplemented
 	http.Error(res, http.StatusText(status), status)
 }
