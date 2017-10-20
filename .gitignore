@@ -1,3 +1,11 @@
+# IGNORE PERSONAL FILES --------------------------------------------------------
+#
+# exclude .env file (contains personal info)
+.env
+account_info.json
+
+# IGNORE VIM-SPECIFIC FILES ----------------------------------------------------
+
 # Swap
 [._]*.s[a-v][a-z]
 [._]*.sw[a-p]
