@@ -25,21 +25,22 @@ Payload specification:
         "type": "string"
     },
 
-        "baseCurrency": {
-            "type": "string"
-        },
-        "targetCurrency": {
+    "baseCurrency": {
+        "type": "string"
+    },
 
-            "type": "string"
-        },
+    "targetCurrency": {
 
-        "minTriggerValue": {
-            "type": "number"
-        }, 
+        "type": "string"
+    },
 
-        "maxTriggerValue": {
-            "type": "number"
-        }
+    "minTriggerValue": {
+        "type": "number"
+    }, 
+
+    "maxTriggerValue": {
+        "type": "number"
+    }
 }
 ```
 
@@ -50,13 +51,10 @@ Example:
 {
 
     "webhookURL": "http://remoteUrl:8080/randomWebhookPath",
-
-        "baseCurrency": "EUR",
-        "targetCurrency": "NOK",
-
-        "minTriggerValue": 1.50, 
-
-        "maxTriggerValue": 2.55
+    "baseCurrency": "EUR",
+    "targetCurrency": "NOK",
+    "minTriggerValue": 1.50, 
+    "maxTriggerValue": 2.55
 }
 ```
 
@@ -80,21 +78,23 @@ Payload Specification:
     "baseCurrency": {
         "type": "string"
     },
-        "targetCurrency": {
 
-            "type": "string"
-        },
-        "currentRate": {
-            "type": "number"
-        },
+    "targetCurrency": {
 
-        "minTriggerValue": {
-            "type": "number"
-        }, 
+        "type": "string"
+    },
 
-        "maxTriggerValue": {
-            "type": "number"
-        }
+    "currentRate": {
+        "type": "number"
+    },
+
+    "minTriggerValue": {
+        "type": "number"
+    }, 
+
+    "maxTriggerValue": {
+        "type": "number"
+    }
 }
 ```
 
@@ -104,12 +104,10 @@ Example:
 {
 
     "baseCurrency": "EUR",
-        "targetCurrency": "NOK",
-        "currentRate": 2.75,
-
-        "minTriggerValue": 1.50, 
-
-        "maxTriggerValue": 2.55
+    "targetCurrency": "NOK",
+    "currentRate": 2.75,
+    "minTriggerValue": 1.50, 
+    "maxTriggerValue": 2.55
 }
 ```
 
@@ -146,7 +144,7 @@ Body:
 ```
 {
     "baseCurrency": "EUR",
-        "targetCurrency": "NOK"
+    "targetCurrency": "NOK"
 
 }
 ```
@@ -170,7 +168,7 @@ Body:
 ```
 {
     "baseCurrency": "EUR",
-        "targetCurrency": "NOK"
+    "targetCurrency": "NOK"
 
 }
 ```
