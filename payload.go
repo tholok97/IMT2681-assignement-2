@@ -1,22 +1,26 @@
 package main
 
+// Subscriber holds info about a subscriber to currency-info in the system
 type Subscriber struct {
-	webhookURL      string `json:"webhookURL"`
-	baseCurrency    string `json:"baseCurrency"`
-	targetCurrency  string `json:"targetCurrency"`
-	minTriggerValue int    `json:"minTriggerValue"`
-	maxTriggerValue int    `json:"maxTriggerValue"`
+	WebhookURL      string `json:"webhookURL"`
+	BaseCurrency    string `json:"baseCurrency"`
+	TargetCurrency  string `json:"targetCurrency"`
+	MinTriggerValue int    `json:"minTriggerValue"`
+	MaxTriggerValue int    `json:"maxTriggerValue"`
 }
 
+// CurrencyPayload holds info sent to subscriber
 type CurrencyPayload struct {
-	baseCurrency    string `json:"baseCurrency"`
-	targetCurrency  string `json:"targetCurrency"`
-	currentRate     int    `json:"currentRate"`
-	minTriggerValue int    `json:"minTriggerValue"`
-	maxTriggerValue int    `json:"maxTriggerValue"`
+	BaseCurrency    string `json:"baseCurrency"`
+	TargetCurrency  string `json:"targetCurrency"`
+	CurrentRate     int    `json:"currentRate"`
+	MinTriggerValue int    `json:"minTriggerValue"`
+	MaxTriggerValue int    `json:"maxTriggerValue"`
 }
 
+// CurrencyRequest holds info received from the user during basic currency
+// requests
 type CurrencyRequest struct {
-	baseCurrency   string `json:"baseCurrency"`
-	targetCurrency string `json:"targetCurrency"`
+	BaseCurrency   string `json:"baseCurrency"`
+	TargetCurrency string `json:"targetCurrency"`
 }

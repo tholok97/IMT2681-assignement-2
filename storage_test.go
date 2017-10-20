@@ -63,11 +63,11 @@ func DBGetAllTest(t *testing.T, db SubscriberDB) {
 
 }
 
-// test all the features of a TestVolitileSubscriberDB
-func TestVolitileSubscriberDB(t *testing.T) {
+// test all the features of a TestVolatileSubscriberDB
+func TestVolatileSubscriberDB(t *testing.T) {
 
 	// make a new db (This function should always work -> not tested)
-	db := VolitileSubscriberDBFactory()
+	db := VolatileSubscriberDBFactory()
 
 	// Test each of the functionalities
 	DBAddTest(t, &db)

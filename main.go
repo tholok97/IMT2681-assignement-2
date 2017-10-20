@@ -16,7 +16,7 @@ func main() {
 	}
 
 	// set up handlers
-	http.HandleFunc("/", handleRequest)
+	http.HandleFunc("/", handleSubscriberRequest)
 	http.HandleFunc("/latest/", handleLatest)
 	http.HandleFunc("/average/", handleAverage)
 
@@ -30,16 +30,19 @@ func main() {
 	}
 }
 
-func handleRequest(res http.ResponseWriter, req *http.Request) {
+// handle subscriber requests
+func handleSubscriberRequest(res http.ResponseWriter, req *http.Request) {
 	status := http.StatusNotImplemented
 	http.Error(res, http.StatusText(status), status)
 }
 
+// handle requests about latests data
 func handleLatest(res http.ResponseWriter, req *http.Request) {
 	status := http.StatusNotImplemented
 	http.Error(res, http.StatusText(status), status)
 }
 
+// handle requests about average data
 func handleAverage(res http.ResponseWriter, req *http.Request) {
 	status := http.StatusNotImplemented
 	http.Error(res, http.StatusText(status), status)
