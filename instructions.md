@@ -1,7 +1,6 @@
-
 # Assignment 2 - Persistence, Live feed, Notifications
 
-##Instructions
+## Instructions
 
 Develop a service, that will allow a user to monitor a currency ticker, and notify a webhook upon certain conditions are met, such as the price falling below or going above a given threshold. The API must allow the user to specify the base currency, the target currency, and the min and max price for the event to trigger the notification. The notification will be provided via a webhook specified by the user, and multiple webhooks should be provided (predefined types). 
 
@@ -186,9 +185,11 @@ Submission system will be available at http://prod3.imt.hig.no/submission/
 
 ## Resources
 
-http://fixer.io/  Currency ticker data
-https://mlab.com/  MongoDB cloud hosting (choose the FREE plan)
-http://gopkg.in/mgo.v2 MongoDB Go driver
-https://discordapp.com/developers/docs/resources/webhook Discord webhooks
+* http://fixer.io/  Currency ticker data
+* https://mlab.com/  MongoDB cloud hosting (choose the FREE plan)
+* http://gopkg.in/mgo.v2 MongoDB Go driver
+* https://discordapp.com/developers/docs/resources/webhook Discord webhooks
+
+
 Note: most likely we will use Heroku-based deployment, but, we need to test it first.
 
