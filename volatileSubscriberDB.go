@@ -44,13 +44,9 @@ func (db *VolatileSubscriberDB) Get(id int) (Subscriber, error) {
 
 // GetAll gets all subscribers as slice
 func (db *VolatileSubscriberDB) GetAll() ([]Subscriber, error) {
-	if dbCount, countErr := db.Count(); countErr != nil {
-		all := make([]Subscriber, 0, dbCount)
-		for _, s := range db.subscribers {
-			all = append(all, s)
-		}
-		return all, nil
-	} else {
-		return nil, countErr
+	all := make([]Subscriber, 0, len(db.subscribers))
+	for _, s := range db.subscribers {
+		all = append(all, s)
 	}
+	return all, nil
 }
