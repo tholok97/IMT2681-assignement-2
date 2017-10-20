@@ -18,6 +18,7 @@ Path: /root
 
 Payload specification:
 
+```
 {
 
     "webhookURL": {
@@ -40,10 +41,12 @@ Payload specification:
             "type": "number"
         }
 }
+```
 
 
 Example:
 
+```
 {
 
     "webhookURL": "http://remoteUrl:8080/randomWebhookPath",
@@ -55,6 +58,7 @@ Example:
 
         "maxTriggerValue": 2.55
 }
+```
 
 #### Response
 
@@ -70,6 +74,7 @@ Path: webhookUrl
 
 Payload Specification:
 
+```
 {
 
     "baseCurrency": {
@@ -91,9 +96,11 @@ Payload Specification:
             "type": "number"
         }
 }
+```
 
 Example:
 
+```
 {
 
     "baseCurrency": "EUR",
@@ -104,6 +111,7 @@ Example:
 
         "maxTriggerValue": 2.55
 }
+```
 
 #### Response
 
@@ -135,11 +143,13 @@ Path:  /root/latest
 
 Body:
 
+```
 {
     "baseCurrency": "EUR",
         "targetCurrency": "NOK"
 
 }
+```
 
 #### Response
 
@@ -157,11 +167,13 @@ Path: /root/average
 
 Body:
 
+```
 {
     "baseCurrency": "EUR",
         "targetCurrency": "NOK"
 
 }
+```
 
 #### Response
 
