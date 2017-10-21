@@ -8,14 +8,13 @@ import (
 
 func main() {
 
-	// get the port heroku assignened for us
+	// (try to) get the port from heroku config vars
 	port := os.Getenv("PORT")
-
-	if port == "" { // ....if heroku didn't give us a port
+	if port == "" {
 		panic("No port specified")
 	}
 
-	// set up handler
+	// set up handler (TODO: db will be changed to a mongodb one eventually)
 	db := VolatileSubscriberDBFactory()
 	handler := SubscriberHandlerFactory(&db)
 
@@ -28,7 +27,7 @@ func main() {
 	fmt.Println("Listening on port " + port + "...")
 	err := http.ListenAndServe(":"+port, nil)
 
-	// if error, panic
+	// if we couldn't set up the server, give up
 	if err != nil {
 		panic(err)
 	}
