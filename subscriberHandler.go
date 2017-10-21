@@ -48,7 +48,6 @@ func (handler *SubscriberHandler) handleSubscriberRequest(res http.ResponseWrite
 
 		// respond with id given by db
 		fmt.Fprint(res, id)
-	case "GET":
 	default:
 		status := http.StatusNotImplemented
 		http.Error(res, http.StatusText(status), status)
