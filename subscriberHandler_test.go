@@ -174,3 +174,19 @@ func TestSubscriberHandler_handleSubscriberRequest_GET(t *testing.T) {
 	}
 
 }
+
+// assert that non-supported request to / returns not implemented
+func TestSubscriberHandler_handleSubscriberRequest_DEFAULT(t *testing.T) {
+
+	// instantiate test handler using volatile db (shouldn't fail)
+	db := VolatileSubscriberDBFactory()
+	handler := SubscriberHandlerFactory(&db)
+
+	// instantiate mock HTTP server
+	ts := httptest.NewServer(http.HandlerFunc(handler.handleSubscriberRequest))
+	defer ts.Close()
+
+	// asssert that not implemented is returned for PATCH method (not supported)
+	reqTest(t, ts, "", http.MethodPatch, http.NoBody, http.StatusNotImplemented,
+		"PATCH should return not implemented")
+}
