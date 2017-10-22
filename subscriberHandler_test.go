@@ -122,7 +122,8 @@ func TestSubscriberHandler_handleSubscriberRequest_GET(t *testing.T) {
 	invalidID := 2
 
 	// sneak stuff into the db
-	testSub := Subscriber{WebhookURL: "testing"}
+	url := "testing"
+	testSub := Subscriber{WebhookURL: &url}
 	db.subscribers[validID] = testSub
 
 	// assert that request for valid id returns OK
@@ -153,7 +154,7 @@ func TestSubscriberHandler_handleSubscriberRequest_GET(t *testing.T) {
 	}
 
 	// assert that it contains our test data
-	if s.WebhookURL != testSub.WebhookURL {
+	if *s.WebhookURL != *testSub.WebhookURL {
 		t.Error("returned wrong subscriber from get request")
 	}
 

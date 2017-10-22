@@ -5,12 +5,14 @@ import (
 )
 
 func generateTestSubscriber(url string) Subscriber {
+	testText := "TEST"
+	triggerVal := float32(923)
 	return Subscriber{
-		WebhookURL:      url,
-		BaseCurrency:    "TEST",
-		TargetCurrency:  "TEST",
-		MinTriggerValue: 923,
-		MaxTriggerValue: 923,
+		WebhookURL:      &url,
+		BaseCurrency:    &testText,
+		TargetCurrency:  &testText,
+		MinTriggerValue: &triggerVal,
+		MaxTriggerValue: &triggerVal,
 	}
 }
 

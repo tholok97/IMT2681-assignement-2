@@ -34,6 +34,13 @@ func (handler *SubscriberHandler) handleSubscriberRequest_POST(res http.Response
 		return
 	}
 
+	// check validity of posted json
+	if !validateSubscriber(s) {
+		status := http.StatusBadRequest
+		http.Error(res, http.StatusText(status), status)
+		return
+	}
+
 	// (try to) add the student
 	id, addErr := handler.db.Add(s)
 
