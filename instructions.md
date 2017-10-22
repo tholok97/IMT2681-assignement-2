@@ -20,7 +20,6 @@ Payload specification:
 
 ```
 {
-
     "webhookURL": {
         "type": "string"
     },
@@ -49,7 +48,6 @@ Example:
 
 ```
 {
-
     "webhookURL": "http://remoteUrl:8080/randomWebhookPath",
     "baseCurrency": "EUR",
     "targetCurrency": "NOK",
@@ -74,7 +72,6 @@ Payload Specification:
 
 ```
 {
-
     "baseCurrency": {
         "type": "string"
     },
@@ -102,7 +99,6 @@ Example:
 
 ```
 {
-
     "baseCurrency": "EUR",
     "targetCurrency": "NOK",
     "currentRate": 2.75,
@@ -145,7 +141,6 @@ Body:
 {
     "baseCurrency": "EUR",
     "targetCurrency": "NOK"
-
 }
 ```
 
@@ -169,7 +164,6 @@ Body:
 {
     "baseCurrency": "EUR",
     "targetCurrency": "NOK"
-
 }
 ```
 
