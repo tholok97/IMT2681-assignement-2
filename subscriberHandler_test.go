@@ -67,6 +67,15 @@ func TestSubscriberHandler_handleSubscriberRequest_POST(t *testing.T) {
 		"maxTriggerValue": 2.55
 		}`)
 
+	// valid fields, but invalid url
+	invalidURL := strings.NewReader(`{
+		"webhookURL": "http//remoteUrl:8080/randomWebhookPath",
+		"baseCurrency": "EUR",
+		"targetCurrency": "NOK",
+		"minTriggerValue": 1.50, 
+		"maxTriggerValue": 2.55
+		}`)
+
 	// json correct, but missing one field: invalid (TODO: doesn't work)
 	invalidBody := strings.NewReader(`{
 		"webhookURL": "http://remoteUrl:8080/randomWebhookPath",
@@ -85,6 +94,8 @@ func TestSubscriberHandler_handleSubscriberRequest_POST(t *testing.T) {
 		"POST invalid json: malformed")
 	reqTest(t, ts, "", http.MethodPost, veryInvalidBody, http.StatusBadRequest,
 		"POST invalid json: missing field")
+	reqTest(t, ts, "", http.MethodPost, invalidURL, http.StatusBadRequest,
+		"POST invalid json data: malformed URL")
 	resp := reqTest(t, ts, "", http.MethodPost, validBody, http.StatusOK,
 		"POST valid json")
 
@@ -134,9 +145,13 @@ func TestSubscriberHandler_handleSubscriberRequest_GET(t *testing.T) {
 	reqTest(t, ts, "/"+strconv.Itoa(invalidID), http.MethodGet, http.NoBody, http.StatusNotFound,
 		"GET invalid id")
 
-	// assert that malformed request returns bad request
+	// assert that malformed request (non-number id) returns bad request
 	reqTest(t, ts, "/THISISNOTANIDxD", http.MethodGet, http.NoBody, http.StatusBadRequest,
 		"GET malformed id")
+
+	// assert that malformed request (no id) returns bad request
+	reqTest(t, ts, "", http.MethodGet, http.NoBody, http.StatusBadRequest,
+		"GET no id")
 
 	// test body of response from valid request:
 

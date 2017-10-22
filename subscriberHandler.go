@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -21,7 +22,7 @@ func SubscriberHandlerFactory(db SubscriberDB) SubscriberHandler {
 	return handler
 }
 
-func (handler *SubscriberHandler) handleSubscriberRequest_POST(res http.ResponseWriter, req *http.Request) {
+func (handler *SubscriberHandler) handleSubscriberRequestPOST(res http.ResponseWriter, req *http.Request) {
 	// attempt to decode the POST json
 	var s Subscriber
 	err := json.NewDecoder(req.Body).Decode(&s)
@@ -41,6 +42,14 @@ func (handler *SubscriberHandler) handleSubscriberRequest_POST(res http.Response
 		return
 	}
 
+	// check validity of URL in posted json
+	_, err = url.ParseRequestURI(*s.WebhookURL)
+	if err != nil {
+		status := http.StatusBadRequest
+		http.Error(res, http.StatusText(status), status)
+		return
+	}
+
 	// (try to) add the student
 	id, addErr := handler.db.Add(s)
 
@@ -49,13 +58,14 @@ func (handler *SubscriberHandler) handleSubscriberRequest_POST(res http.Response
 	if addErr != nil {
 		status := http.StatusInternalServerError
 		http.Error(res, http.StatusText(status), status)
+		return
 	}
 
 	// respond with id given by db
 	fmt.Fprint(res, id)
 }
 
-func (handler *SubscriberHandler) handleSubscriberRequest_GET(res http.ResponseWriter, req *http.Request) {
+func (handler *SubscriberHandler) handleSubscriberRequestGET(res http.ResponseWriter, req *http.Request) {
 
 	// try to pick out the id from the url
 	parts := strings.Split(req.URL.String(), "/")
@@ -100,9 +110,9 @@ func (handler *SubscriberHandler) handleSubscriberRequest(res http.ResponseWrite
 	// switch on the method of the request
 	switch req.Method {
 	case "POST":
-		handler.handleSubscriberRequest_POST(res, req)
+		handler.handleSubscriberRequestPOST(res, req)
 	case "GET":
-		handler.handleSubscriberRequest_GET(res, req)
+		handler.handleSubscriberRequestGET(res, req)
 	default:
 		status := http.StatusNotImplemented
 		http.Error(res, http.StatusText(status), status)
