@@ -13,31 +13,41 @@ import (
 
 // make request with given method+body, assert statuscode and return pointer
 //	to response (nil if failure)
-func reqTest(t *testing.T, ts *httptest.Server, method string, body io.Reader, expectedCode int) *http.Response {
+func reqTest(t *testing.T, ts *httptest.Server, target, method string, body io.Reader,
+	expectedCode int, msg string) *http.Response {
 
 	// instantiate test client
 	client := &http.Client{}
 
 	// create a request to our mock HTTP server
-	req, err := http.NewRequest(method, ts.URL, body)
+	url := ts.URL + target
+	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		t.Errorf("error constructing valid request")
+		t.Errorf("error constructing valid request (%s)", msg)
+		return nil
 	}
 
 	// do request
 	resp, err := client.Do(req)
 	if err != nil {
-		t.Errorf("error doing valid request")
+		t.Errorf("error doing valid request (%s). Error: %s", msg, err.Error())
+		return nil
+	}
+
+	if resp == nil {
+		return nil
 	}
 
 	// reach to the response from the request
 	if resp.StatusCode != expectedCode {
-		t.Errorf("expected statuscode %d, received %d", expectedCode, resp.StatusCode)
+		t.Errorf("expected statuscode %d, received %d. (%s)", expectedCode,
+			resp.StatusCode, msg)
 	}
 
 	return resp
 }
 
+// TODO: add test case for malformed URL :D
 func TestSubscriberHandler_handleSubscriberRequest_POST(t *testing.T) {
 
 	// instantiate test handler using volatile db (shouldn't fail)
@@ -71,9 +81,12 @@ func TestSubscriberHandler_handleSubscriberRequest_POST(t *testing.T) {
 		}`)
 
 	// asssert that correct error codes are returned (store valid response)
-	reqTest(t, ts, http.MethodPost, invalidBody, http.StatusBadRequest)
-	reqTest(t, ts, http.MethodPost, veryInvalidBody, http.StatusBadRequest)
-	resp := reqTest(t, ts, http.MethodPost, validBody, http.StatusOK)
+	reqTest(t, ts, "", http.MethodPost, invalidBody, http.StatusBadRequest,
+		"POST invalid json: malformed")
+	reqTest(t, ts, "", http.MethodPost, veryInvalidBody, http.StatusBadRequest,
+		"POST invalid json: missing field")
+	resp := reqTest(t, ts, "", http.MethodPost, validBody, http.StatusOK,
+		"POST valid json")
 
 	// test valid response:
 
@@ -113,21 +126,22 @@ func TestSubscriberHandler_handleSubscriberRequest_GET(t *testing.T) {
 	db.subscribers[validID] = testSub
 
 	// assert that request for valid id returns OK
-	validIDBody := strings.NewReader(strconv.Itoa(validID))
-	resp := reqTest(t, ts, http.MethodGet, validIDBody, http.StatusOK)
+	resp := reqTest(t, ts, "/"+strconv.Itoa(validID), http.MethodGet, http.NoBody, http.StatusOK,
+		"GET valid id")
 
 	// assert that request for invalid id doesn't succeed
-	invalidIDBody := strings.NewReader(strconv.Itoa(invalidID))
-	reqTest(t, ts, http.MethodGet, invalidIDBody, http.StatusNotFound)
+	reqTest(t, ts, "/"+strconv.Itoa(invalidID), http.MethodGet, http.NoBody, http.StatusNotFound,
+		"GET invalid id")
 
 	// assert that malformed request returns bad request
-	malformedIDBody := strings.NewReader("THIS IS NOT AN ID xD")
-	reqTest(t, ts, http.MethodGet, malformedIDBody, http.StatusBadRequest)
+	reqTest(t, ts, "/THISISNOTANIDxD", http.MethodGet, http.NoBody, http.StatusBadRequest,
+		"GET malformed id")
 
 	// test body of response from valid request:
 
 	if resp == nil {
 		t.Error("error getting response from server")
+		return
 	}
 
 	// attempt to unmarshall
@@ -135,6 +149,7 @@ func TestSubscriberHandler_handleSubscriberRequest_GET(t *testing.T) {
 	err := json.NewDecoder(resp.Body).Decode(&s)
 	if err != nil {
 		t.Error("error while unmarshalling response:", err.Error())
+		return
 	}
 
 	// assert that it contains our test data
