@@ -1,7 +1,5 @@
 package main
 
-// TODO: handle erors properly
-
 import (
 	"fmt"
 	"net/http"
@@ -10,27 +8,27 @@ import (
 
 func main() {
 
-	// get the port heroku assignened for us
+	// (try to) get the port from heroku config vars
 	port := os.Getenv("PORT")
-
-	if port == "" { // ....if heroku didn't give us a port (DEBUG)
-		port = "8080"
+	if port == "" {
+		panic("No port specified")
 	}
 
-	// set up default path
-	http.HandleFunc("/", handleNotImplemented)
+	// set up handler (TODO: db will be changed to a mongodb one eventually)
+	db := VolatileSubscriberDBFactory()
+	handler := SubscriberHandlerFactory(&db)
+
+	// set up handlerfuncs
+	http.HandleFunc("/", handler.handleSubscriberRequest)
+	http.HandleFunc("/latest/", handler.handleLatest)
+	http.HandleFunc("/average/", handler.handleAverage)
 
 	// start listening on port
 	fmt.Println("Listening on port " + port + "...")
 	err := http.ListenAndServe(":"+port, nil)
 
-	// if error, panic
+	// if we couldn't set up the server, give up
 	if err != nil {
 		panic(err)
 	}
-}
-
-func handleNotImplemented(res http.ResponseWriter, req *http.Request) {
-	status := http.StatusNotImplemented
-	http.Error(res, http.StatusText(status), status)
 }
