@@ -1,6 +1,7 @@
 package main
 
 // Subscriber holds info about a subscriber to currency-info in the system
+// (fields are pointers to make validation of incomming requests trivial)
 type Subscriber struct {
 	WebhookURL      *string  `json:"webhookURL"`
 	BaseCurrency    *string  `json:"baseCurrency"`
@@ -20,6 +21,7 @@ type CurrencyPayload struct {
 
 // CurrencyRequest holds info received from the user during basic currency
 // requests
+// (fields are pointers to make validation of incomming requests trivial)
 type CurrencyRequest struct {
 	BaseCurrency   *string `json:"baseCurrency"`
 	TargetCurrency *string `json:"targetCurrency"`
