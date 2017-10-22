@@ -39,3 +39,13 @@ func validateSubscriber(s Subscriber) bool {
 	}
 	return true
 }
+
+// a currency request is valid if no fields are set to nil
+func validateCurrencyRequest(cr CurrencyRequest) bool {
+	if cr.BaseCurrency == nil ||
+		cr.TargetCurrency == nil {
+
+		return false
+	}
+	return true
+}
