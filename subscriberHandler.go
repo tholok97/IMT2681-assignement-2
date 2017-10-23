@@ -12,13 +12,14 @@ import (
 // SubscriberHandler handles requests from clients. It has info on subscribers
 // and currency
 type SubscriberHandler struct {
-	db SubscriberDB
-	// currency monitor
+	db      SubscriberDB
+	monitor CurrencyMonitor
 }
 
 // SubscriberHandlerFactory returns a fresh handler
-func SubscriberHandlerFactory(db SubscriberDB) SubscriberHandler {
-	handler := SubscriberHandler{db: db}
+func SubscriberHandlerFactory(db SubscriberDB, monitor CurrencyMonitor) SubscriberHandler {
+	handler := SubscriberHandler{db: db, monitor: monitor}
+
 	return handler
 }
 

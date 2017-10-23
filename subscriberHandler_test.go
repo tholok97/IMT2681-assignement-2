@@ -53,7 +53,7 @@ func TestSubscriberHandler_handleSubscriberRequest_POST(t *testing.T) {
 
 	// instantiate test handler using volatile db (shouldn't fail)
 	db := VolatileSubscriberDBFactory()
-	handler := SubscriberHandlerFactory(&db)
+	handler := SubscriberHandlerFactory(&db, nil)
 
 	// instantiate mock HTTP server
 	ts := httptest.NewServer(http.HandlerFunc(handler.handleSubscriberRequest))
@@ -104,6 +104,7 @@ func TestSubscriberHandler_handleSubscriberRequest_POST(t *testing.T) {
 
 	if resp == nil {
 		t.Error("erroring in getting response from server")
+		return
 	}
 
 	// assert that body is a single int
@@ -123,7 +124,7 @@ func TestSubscriberHandler_handleSubscriberRequest_GET(t *testing.T) {
 
 	// instantiate test handler using volatile db (shouldn't fail)
 	db := VolatileSubscriberDBFactory()
-	handler := SubscriberHandlerFactory(&db)
+	handler := SubscriberHandlerFactory(&db, nil)
 
 	// instantiate mock HTTP server
 	ts := httptest.NewServer(http.HandlerFunc(handler.handleSubscriberRequest))
@@ -180,7 +181,7 @@ func TestSubscriberHandler_handleSubscriberRequest_DELETE(t *testing.T) {
 
 	// instantiate test handler using volatile db (shouldn't fail)
 	db := VolatileSubscriberDBFactory()
-	handler := SubscriberHandlerFactory(&db)
+	handler := SubscriberHandlerFactory(&db, nil)
 
 	// instantiate mock HTTP server
 	ts := httptest.NewServer(http.HandlerFunc(handler.handleSubscriberRequest))
@@ -211,7 +212,7 @@ func TestSubscriberHandler_handleSubscriberRequest_DELETE(t *testing.T) {
 		"trying to delete non-existant subscriber")
 
 	// assert that requesting a DELETE with malformed id returns error
-	reqTest(t, ts, "/THISISNOTANIDJ", http.MethodDelete,
+	reqTest(t, ts, "/THISISNOTANID", http.MethodDelete,
 		http.NoBody, http.StatusBadRequest,
 		"trying to DELETE with malformed id in GET request")
 }
@@ -221,7 +222,7 @@ func TestSubscriberHandler_handleSubscriberRequest_DEFAULT(t *testing.T) {
 
 	// instantiate test handler using volatile db (shouldn't fail)
 	db := VolatileSubscriberDBFactory()
-	handler := SubscriberHandlerFactory(&db)
+	handler := SubscriberHandlerFactory(&db, nil)
 
 	// instantiate mock HTTP server
 	ts := httptest.NewServer(http.HandlerFunc(handler.handleSubscriberRequest))
@@ -230,4 +231,76 @@ func TestSubscriberHandler_handleSubscriberRequest_DEFAULT(t *testing.T) {
 	// asssert that not implemented is returned for PATCH method (not supported)
 	reqTest(t, ts, "", http.MethodPatch, http.NoBody, http.StatusNotImplemented,
 		"PATCH should return not implemented")
+}
+
+// assert that non-supported request to / returns not implemented
+func TestSubscriberHandler_handleLatest(t *testing.T) {
+
+	// set up test handler using stub currency monitor
+	monitor := StubCurrencyMonitorFactory(nil, 1.6)
+	handler := SubscriberHandlerFactory(nil, &monitor)
+
+	// instantiate mock HTTP server
+	ts := httptest.NewServer(http.HandlerFunc(handler.handleLatest))
+	defer ts.Close()
+
+	// TODO add stuff for testing invalid currencies, error handling, valid
+
+	// setup test bodies
+	valid := strings.NewReader(`{
+		"baseCurrency": "EUR",
+		"targetCurrency": "NOK"
+		}`)
+
+	malformedCurrency1 := strings.NewReader(`{
+		"baseCurrency": "laskdfjalsdfj",
+		"targetCurrency": "NOK"
+		}`)
+
+	malformedCurrency2 := strings.NewReader(`{
+		"baseCurrency": "EUR",
+		"targetCurrency": "skldfjsldkfj"
+		}`)
+
+	malformedCurrency3 := strings.NewReader(`{
+		"baseCurrency": "alskdfjs",
+		"targetCurrency": "skdfs"
+		}`)
+
+	malformedBody := strings.NewReader(`{
+		"baseCurrency": "EUR"
+		}`)
+
+	// assert currency codes
+	resp := reqTest(t, ts, "", http.MethodPost, valid, http.StatusOK, "trying to request latest currency info with valid POST")
+	reqTest(t, ts, "", http.MethodPost, malformedCurrency1, http.StatusBadRequest, "trying to request latest currency info with invalid currency in POST")
+	reqTest(t, ts, "", http.MethodPost, malformedCurrency2, http.StatusBadRequest, "trying to request latest currency info with invalid currency in POST")
+	reqTest(t, ts, "", http.MethodPost, malformedCurrency3, http.StatusBadRequest, "trying to request latest currency info with invalid currencies in POST")
+	reqTest(t, ts, "", http.MethodPost, malformedBody, http.StatusBadRequest, "trying to request with malformed body (json malformed)")
+
+	// assert that resp from valid request is a number
+	if resp == nil {
+		t.Error("nil response returned from valid request")
+		return
+	}
+
+	// assert that body is a single float32
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Error("error converting body in response to []byte")
+		return
+	}
+
+	number, err := strconv.ParseFloat(string(b), 32)
+	if err != nil {
+		t.Error("response from valid latest request isn't int")
+		return
+	}
+	number32 := float32(number)
+
+	// assert that it's the correct value
+	if number32 != monitor.nextVal {
+		t.Errorf("latest request returned wrong number. Got: %s, wanted: %s", number, monitor.nextVal)
+		return
+	}
 }

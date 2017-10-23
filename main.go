@@ -14,9 +14,10 @@ func main() {
 		panic("No port specified")
 	}
 
-	// set up handler (TODO: db will be changed to a mongodb one eventually)
+	// set up handler (TODO will use real db and monitor eventually)
 	db := VolatileSubscriberDBFactory()
-	handler := SubscriberHandlerFactory(&db)
+	monitor := StubCurrencyMonitorFactory(nil, 1.6)
+	handler := SubscriberHandlerFactory(&db, &monitor)
 
 	// set up handlerfuncs
 	http.HandleFunc("/", handler.handleSubscriberRequest)
