@@ -190,6 +190,11 @@ func TestSubscriberHandler_handleSubscriberRequest_DELETE(t *testing.T) {
 	validID := 1
 	invalidID := 2
 
+	// sneak stuff into the db
+	url := "testing"
+	testSub := Subscriber{WebhookURL: &url}
+	db.subscribers[validID] = testSub
+
 	// assert that calling delete on valid id returns OK
 	reqTest(t, ts, "/"+strconv.Itoa(validID), http.MethodDelete,
 		http.NoBody, http.StatusOK,
