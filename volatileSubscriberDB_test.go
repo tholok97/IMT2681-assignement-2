@@ -58,6 +58,44 @@ func TestVolatileSubscriberDB_Add(t *testing.T) {
 	}
 }
 
+func TestVolatileSubscriberDB_Remove(t *testing.T) {
+
+	// make a new db
+	db := VolatileSubscriberDBFactory()
+
+	// test subscriber
+	s1 := generateTestSubscriber("1")
+
+	// test id's
+	id1 := 2 // VALID
+	id2 := 3 // INVALID
+
+	// add test subscriber to db
+	db.subscribers[id1] = s1
+
+	// assert that deletion of valid id is possible
+	err := db.Remove(id1)
+	if err != nil {
+		t.Error("removal of valid subscriber not possible. error: ", err.Error())
+		return
+	}
+
+	// asssert that subscriber was actually deleted
+	_, ok := db.subscribers[id1]
+	if ok {
+		t.Error("remove returned no error not subscriber was not actually removed")
+		return
+	}
+
+	// assert that removal with invalid id fails (properly)
+	err = db.Remove(id2)
+	if err != errNotFound {
+		t.Errorf("removal with invalid id didn't return the correct error. Got: %s, wanted: %s", err.Error(), errNotFound.Error())
+	} else if err == nil {
+		t.Errorf("removal with invalid id didn't return an error")
+	}
+}
+
 func TestVolatileSubscriberDB_Count(t *testing.T) {
 
 	// make a new db
@@ -115,7 +153,10 @@ func TestVolatileSubscriberDB_Get(t *testing.T) {
 
 	// assert that error is returned for invalid id
 	_, err = db.Get(id2)
-	if err == nil {
+	if err != errNotFound {
+		t.Errorf("wrong kind of error returned for wrong id. "+
+			"Got: %s, wanted: %s", err.Error(), errNotFound.Error())
+	} else if err == nil {
 		t.Error("error not returned for invalid id")
 	}
 }

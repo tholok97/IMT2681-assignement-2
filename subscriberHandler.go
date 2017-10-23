@@ -84,7 +84,6 @@ func (handler *SubscriberHandler) handleSubscriberRequestGET(res http.ResponseWr
 		return
 	}
 
-	// TODO hva om sending av json feiler? content-type vil være json likevel?
 	http.Header.Add(res.Header(), "content-type", "application/json")
 
 	// decode and send the sub
@@ -96,6 +95,33 @@ func (handler *SubscriberHandler) handleSubscriberRequestGET(res http.ResponseWr
 
 }
 
+func (handler *SubscriberHandler) handleSubscriberRequestDELETE(res http.ResponseWriter, req *http.Request) {
+
+	// try to pick out the id from the url
+	parts := strings.Split(req.URL.String(), "/")
+	if len(parts) < 2 {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	}
+
+	// convert (string) id to int
+	id, err := strconv.Atoi(parts[1])
+	if err != nil {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	}
+
+	// attempt to delete the subscriber with id
+	err = handler.db.Remove(id)
+	if err != nil {
+		respWithCode(&res, http.StatusNotFound)
+		return
+	}
+
+	// deletion succeeded. yay!
+	respWithCode(&res, http.StatusOK)
+}
+
 // handle subscriber requests
 func (handler *SubscriberHandler) handleSubscriberRequest(res http.ResponseWriter, req *http.Request) {
 
@@ -105,6 +131,8 @@ func (handler *SubscriberHandler) handleSubscriberRequest(res http.ResponseWrite
 		handler.handleSubscriberRequestPOST(res, req)
 	case "GET":
 		handler.handleSubscriberRequestGET(res, req)
+	case "DELETE":
+		handler.handleSubscriberRequestDELETE(res, req)
 	default:
 		respWithCode(&res, http.StatusNotImplemented)
 	}

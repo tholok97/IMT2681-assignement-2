@@ -42,6 +42,7 @@ func reqTest(t *testing.T, ts *httptest.Server, target, method string, body io.R
 	if resp.StatusCode != expectedCode {
 		t.Errorf("expected statuscode %d, received %d. (%s)", expectedCode,
 			resp.StatusCode, msg)
+		return nil
 	}
 
 	return resp
@@ -173,6 +174,46 @@ func TestSubscriberHandler_handleSubscriberRequest_GET(t *testing.T) {
 		t.Error("returned wrong subscriber from get request")
 	}
 
+}
+
+func TestSubscriberHandler_handleSubscriberRequest_DELETE(t *testing.T) {
+
+	// instantiate test handler using volatile db (shouldn't fail)
+	db := VolatileSubscriberDBFactory()
+	handler := SubscriberHandlerFactory(&db)
+
+	// instantiate mock HTTP server
+	ts := httptest.NewServer(http.HandlerFunc(handler.handleSubscriberRequest))
+	defer ts.Close()
+
+	// test ids
+	validID := 1
+	invalidID := 2
+
+	// sneak stuff into the db
+	url := "testing"
+	testSub := Subscriber{WebhookURL: &url}
+	db.subscribers[validID] = testSub
+
+	// assert that calling delete on valid id returns OK
+	reqTest(t, ts, "/"+strconv.Itoa(validID), http.MethodDelete,
+		http.NoBody, http.StatusOK,
+		"trying to delete subscriber using valid id")
+
+	// assert that the entry was actually deleted
+	if len(db.subscribers) != 0 {
+		t.Error("subscriber was not deleted in DELETE")
+	}
+
+	// assert that deleting non-existant id returns error
+	reqTest(t, ts, "/"+strconv.Itoa(invalidID), http.MethodDelete,
+		http.NoBody, http.StatusNotFound,
+		"trying to delete non-existant subscriber")
+
+	// assert that requesting a DELETE with malformed id returns error
+	reqTest(t, ts, "/THISISNOTANIDJ", http.MethodDelete,
+		http.NoBody, http.StatusBadRequest,
+		"trying to DELETE with malformed id in GET request")
 }
 
 // assert that non-supported request to / returns not implemented
