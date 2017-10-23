@@ -27,6 +27,11 @@ func (db *VolatileSubscriberDB) Add(s Subscriber) (int, error) {
 	return db.nextID - 1, nil
 }
 
+// Add adds a subscriber to the db
+func (db *VolatileSubscriberDB) Remove(id int) error {
+	return errors.New("NOT IMPLEMENTED")
+}
+
 // Count returns the number of subscribers in the db
 func (db *VolatileSubscriberDB) Count() (int, error) {
 	return len(db.subscribers), nil
