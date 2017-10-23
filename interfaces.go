@@ -12,6 +12,6 @@ type SubscriberDB interface {
 // CurrencyMontitor defines how something that monitors currency behaves
 type CurrencyMonitor interface {
 	Update(currencyAPIURL string) error
-	Latest(curr1, curr2 string) (float32 error)
-	Average(curr1, curr2 string, days int) (float32 error)
+	Latest(curr1, curr2 string) (float32, error)
+	Average(curr1, curr2 string, days int) (float32, error)
 }
