@@ -7,3 +7,10 @@ type SubscriberDB interface {
 	Get(id int) (Subscriber, error)
 	GetAll() ([]Subscriber, error)
 }
+
+// CurrencyMontitor defines how something that monitors currency behaves
+type CurrencyMonitor interface {
+	Update(currencyAPIURL string) error
+	Latest(curr1, curr2 string) error
+	Average(curr1, curr2 string, days int) error
+}
