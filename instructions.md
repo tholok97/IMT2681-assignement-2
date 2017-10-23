@@ -177,6 +177,20 @@ Example: 2.75
 
 *Important: For all requests, ensure that you use appropriate status codes and semantics (see IETF RFC 7231 for details).*
 
+### Addendum: Trigger webhooks for testing purposes
+
+This trigger (Method: GET) invokes all webhooks (i.e. bypasses the timed trigger) and sends the payload as specified under 'Invoking a registered webhook'. This functionality is meant for testing and evaluation purposes.
+
+#### Request
+
+Path: /root/evaluationtrigger
+
+Body: empty
+
+#### Response
+
+Reasonable status code
+
 ## Formal aspects
 
 This assignment is worth 15% of your total mark for the internal portfolio. The assignment is individual. Code snippets used from the web and other alternative sources (StackOverflow, tutorials) must be clearly attributed to the original source, in the source code. Your code needs to have a test coverage of at least 40%. Note that your tests actually need to pass to meet this requirement. There is +3 points bounty for extra work.
