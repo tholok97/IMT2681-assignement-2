@@ -42,7 +42,7 @@ func reqTest(t *testing.T, ts *httptest.Server, target, method string, body io.R
 	if resp.StatusCode != expectedCode {
 		t.Errorf("expected statuscode %d, received %d. (%s)", expectedCode,
 			resp.StatusCode, msg)
-		return
+		return nil
 	}
 
 	return resp
@@ -188,7 +188,7 @@ func TestSubscriberHandler_handleSubscriberRequest_DELETE(t *testing.T) {
 
 	// test ids
 	validID := 1
-	//invalidID := 2
+	invalidID := 2
 
 	// assert that calling delete on valid id returns OK
 	reqTest(t, ts, "/"+strconv.Itoa(validID), http.MethodDelete,
@@ -199,6 +199,16 @@ func TestSubscriberHandler_handleSubscriberRequest_DELETE(t *testing.T) {
 	if len(db.subscribers) != 0 {
 		t.Error("subscriber was not deleted in DELETE")
 	}
+
+	// assert that deleting non-existant id returns error
+	reqTest(t, ts, "/"+strconv.Itoa(invalidID), http.MethodDelete,
+		http.NoBody, http.StatusNotFound,
+		"trying to delete non-existant subscriber")
+
+	// assert that requesting a DELETE with malformed id returns error
+	reqTest(t, ts, "/THISISNOTANIDJ", http.MethodDelete,
+		http.NoBody, http.StatusBadRequest,
+		"trying to DELETE with malformed id in GET request")
 }
 
 // assert that non-supported request to / returns not implemented
