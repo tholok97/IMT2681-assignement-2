@@ -27,7 +27,7 @@ func (db *VolatileSubscriberDB) Add(s Subscriber) (int, error) {
 	return db.nextID - 1, nil
 }
 
-// Add adds a subscriber to the db
+// Remove subscriber with id. Err if not found
 func (db *VolatileSubscriberDB) Remove(id int) error {
 	_, ok := db.subscribers[id]
 	if ok {
