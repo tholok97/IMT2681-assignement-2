@@ -4,8 +4,8 @@ import (
 	"errors"
 )
 
-// error(s) used for this type:
-var errDoesNotExist = errors.New("subscriber does not exist")
+// error vars (so user can detect what kind of error occured and react on it)
+var errNotFound = errors.New("subscriber not found")
 
 // VolatileSubscriberDB is a subscriber database that uses volatile memory.
 // used for testing
@@ -29,7 +29,12 @@ func (db *VolatileSubscriberDB) Add(s Subscriber) (int, error) {
 
 // Add adds a subscriber to the db
 func (db *VolatileSubscriberDB) Remove(id int) error {
-	return errors.New("NOT IMPLEMENTED")
+	_, ok := db.subscribers[id]
+	if ok {
+		delete(db.subscribers, id)
+		return nil
+	}
+	return errNotFound
 }
 
 // Count returns the number of subscribers in the db
@@ -42,7 +47,7 @@ func (db *VolatileSubscriberDB) Get(id int) (Subscriber, error) {
 	var err error
 	s, ok := db.subscribers[id]
 	if !ok {
-		err = errDoesNotExist
+		err = errNotFound
 	}
 	return s, err
 }
