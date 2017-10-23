@@ -30,23 +30,20 @@ func (handler *SubscriberHandler) handleSubscriberRequestPOST(res http.ResponseW
 	// if couldn't decode -> bad req
 	// (SHOULD ALSO FAIL FOR NON-COMPLIANT JSON)
 	if err != nil {
-		status := http.StatusBadRequest
-		http.Error(res, http.StatusText(status), status)
+		respWithCode(&res, http.StatusBadRequest)
 		return
 	}
 
 	// check validity of posted json
 	if !validateSubscriber(s) {
-		status := http.StatusBadRequest
-		http.Error(res, http.StatusText(status), status)
+		respWithCode(&res, http.StatusBadRequest)
 		return
 	}
 
 	// check validity of URL in posted json
 	_, err = url.ParseRequestURI(*s.WebhookURL)
 	if err != nil {
-		status := http.StatusBadRequest
-		http.Error(res, http.StatusText(status), status)
+		respWithCode(&res, http.StatusBadRequest)
 		return
 	}
 
@@ -56,8 +53,7 @@ func (handler *SubscriberHandler) handleSubscriberRequestPOST(res http.ResponseW
 	// if couldn't add -> internal server error
 	//  (client's responsability to retry)
 	if addErr != nil {
-		status := http.StatusInternalServerError
-		http.Error(res, http.StatusText(status), status)
+		respWithCode(&res, http.StatusInternalServerError)
 		return
 	}
 
@@ -70,24 +66,21 @@ func (handler *SubscriberHandler) handleSubscriberRequestGET(res http.ResponseWr
 	// try to pick out the id from the url
 	parts := strings.Split(req.URL.String(), "/")
 	if len(parts) < 2 {
-		status := http.StatusBadRequest
-		http.Error(res, http.StatusText(status), status)
+		respWithCode(&res, http.StatusBadRequest)
 		return
 	}
 
 	// convert (string) id to int
 	id, err := strconv.Atoi(parts[1])
 	if err != nil {
-		status := http.StatusBadRequest
-		http.Error(res, http.StatusText(status), status)
+		respWithCode(&res, http.StatusBadRequest)
 		return
 	}
 
 	// attempt to fetch subscriber with given id
 	sub, err := handler.db.Get(id)
 	if err != nil {
-		status := http.StatusNotFound
-		http.Error(res, http.StatusText(status), status)
+		respWithCode(&res, http.StatusNotFound)
 		return
 	}
 
@@ -97,8 +90,7 @@ func (handler *SubscriberHandler) handleSubscriberRequestGET(res http.ResponseWr
 	// decode and send the sub
 	err = json.NewEncoder(res).Encode(sub)
 	if err != nil {
-		status := http.StatusInternalServerError
-		http.Error(res, http.StatusText(status), status)
+		respWithCode(&res, http.StatusInternalServerError)
 		return
 	}
 
@@ -114,19 +106,21 @@ func (handler *SubscriberHandler) handleSubscriberRequest(res http.ResponseWrite
 	case "GET":
 		handler.handleSubscriberRequestGET(res, req)
 	default:
-		status := http.StatusNotImplemented
-		http.Error(res, http.StatusText(status), status)
+		respWithCode(&res, http.StatusNotImplemented)
 	}
 }
 
 // handle requests about latests data
 func (handler *SubscriberHandler) handleLatest(res http.ResponseWriter, req *http.Request) {
-	status := http.StatusNotImplemented
-	http.Error(res, http.StatusText(status), status)
+	respWithCode(&res, http.StatusNotImplemented)
 }
 
 // handle requests about average data
 func (handler *SubscriberHandler) handleAverage(res http.ResponseWriter, req *http.Request) {
-	status := http.StatusNotImplemented
-	http.Error(res, http.StatusText(status), status)
+	respWithCode(&res, http.StatusNotImplemented)
+}
+
+// utility function for responding with a simple statuscode
+func respWithCode(res *http.ResponseWriter, status int) {
+	http.Error(*res, http.StatusText(status), status)
 }
