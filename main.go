@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -11,9 +12,9 @@ func main() {
 
 	// (try to) get the port from heroku config vars
 	port := getENV("PORT")
-	//schHour := getENV("SCHEDULE_HOUR")
-	//schMinute := getENV("SCHEDULE_MINUTE")
-	//schSecond := getENV("SCHEDULE_SECOND")
+	schHour := getIntENV("SCHEDULE_HOUR")
+	schMinute := getIntENV("SCHEDULE_MINUTE")
+	schSecond := getIntENV("SCHEDULE_SECOND")
 
 	// set up handler (TODO will use real db and monitor eventually)
 	db := VolatileSubscriberDBFactory()
@@ -39,11 +40,8 @@ func main() {
 		handler.monitor.Update()
 		handler.notifyAll()
 
-		/*
-			dur := durUntilTime(schHour, schMinute, schSecond)
-			time.Sleep(dur)
-		*/
-		break // TODO
+		dur := durUntilClock(schHour, schMinute, schSecond)
+		time.Sleep(dur)
 	}
 }
 
@@ -55,6 +53,16 @@ func getENV(name string) string {
 	}
 	fmt.Println("Read env ", name, " = ", ret)
 	return ret
+}
+
+// get environment variable as int. If something goes wrong: PANIC
+func getIntENV(name string) int {
+	ret := getENV(name)
+	num, err := strconv.Atoi(ret)
+	if err != nil {
+		panic("Error converting env to int: " + err.Error())
+	}
+	return num
 }
 
 // calculate duration until next HH:MM:SS
