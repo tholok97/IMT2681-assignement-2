@@ -21,7 +21,7 @@ func StubCurrencyMonitorFactory(err error, nextVal float32) StubCurrencyMonitor 
 }
 
 // Update the dataset (faked)
-func (monitor *StubCurrencyMonitor) Update(currencyAPIURL string) error {
+func (monitor *StubCurrencyMonitor) Update() error {
 	return monitor.err
 }
 

@@ -10,7 +10,6 @@ func main() {
 
 	// (try to) get the port from heroku config vars
 	port := getENV("PORT")
-	currencyAPI := "testing"
 
 	// set up handler (TODO will use real db and monitor eventually)
 	db := VolatileSubscriberDBFactory()
@@ -33,7 +32,7 @@ func main() {
 
 	// update monitor -> notify -> sleep
 	for {
-		handler.monitor.Update(currencyAPI)
+		handler.monitor.Update()
 		handler.notifyAll()
 
 		// calculate time until next update/notify and sleep
