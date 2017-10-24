@@ -164,7 +164,7 @@ func (handler *SubscriberHandler) handleLatest(res http.ResponseWriter, req *htt
 		return
 	}
 
-	// (try to) add the student
+	// (try to) get the latest currency info
 	rate, rateErr := handler.monitor.Latest(*currReq.BaseCurrency, *currReq.TargetCurrency)
 
 	// if couldn't get latest -> either not found or internal error
@@ -183,7 +183,43 @@ func (handler *SubscriberHandler) handleLatest(res http.ResponseWriter, req *htt
 
 // handle requests about average data
 func (handler *SubscriberHandler) handleAverage(res http.ResponseWriter, req *http.Request) {
-	respWithCode(&res, http.StatusNotImplemented)
+
+	// ..only supports POST method
+	if req.Method != http.MethodPost {
+		respWithCode(&res, http.StatusNotImplemented)
+	}
+
+	// attempt to decode the POST json
+	var currReq CurrencyRequest
+	err := json.NewDecoder(req.Body).Decode(&currReq)
+
+	// if couldn't decode -> bad req
+	if err != nil {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	}
+
+	// check validity of posted json
+	if !validateCurrencyRequest(currReq) {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	}
+
+	// (try to) get the average currency info for the last 7 days
+	rate, rateErr := handler.monitor.Average(*currReq.BaseCurrency, *currReq.TargetCurrency, 7)
+
+	// if couldn't get average -> either not found or internal error
+	//  (client's responsability to retry)
+	if rateErr == errInvalidCurrency {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	} else if rateErr != nil {
+		respWithCode(&res, http.StatusInternalServerError)
+		return
+	}
+
+	// respond with id given by db
+	fmt.Fprint(res, rate)
 }
 
 // utility function for responding with a simple statuscode
