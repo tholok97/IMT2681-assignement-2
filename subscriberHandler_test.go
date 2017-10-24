@@ -233,7 +233,6 @@ func TestSubscriberHandler_handleSubscriberRequest_DEFAULT(t *testing.T) {
 		"PATCH should return not implemented")
 }
 
-// assert that non-supported request to / returns not implemented
 func TestSubscriberHandler_handleLatest(t *testing.T) {
 
 	// set up test handler using stub currency monitor
@@ -302,6 +301,78 @@ func TestSubscriberHandler_handleLatest(t *testing.T) {
 	// assert that it's the correct value
 	if number32 != monitor.nextVal {
 		t.Errorf("latest request returned wrong number. Got: %s, wanted: %s", number, monitor.nextVal)
+		return
+	}
+}
+
+func TestSubscriberHandler_handleAverage(t *testing.T) {
+
+	// set up test handler using stub currency monitor
+	monitor := StubCurrencyMonitorFactory(nil, 1.6)
+	handler := SubscriberHandlerFactory(nil, &monitor)
+
+	// instantiate mock HTTP server
+	ts := httptest.NewServer(http.HandlerFunc(handler.handleAverage))
+	defer ts.Close()
+
+	// TODO add stuff for testing invalid currencies, error handling, valid
+
+	// setup test bodies
+	valid := strings.NewReader(`{
+		"baseCurrency": "EUR",
+		"targetCurrency": "NOK"
+		}`)
+
+	malformedCurrency1 := strings.NewReader(`{
+		"baseCurrency": "laskdfjalsdfj",
+		"targetCurrency": "NOK"
+		}`)
+
+	malformedCurrency2 := strings.NewReader(`{
+		"baseCurrency": "EUR",
+		"targetCurrency": "skldfjsldkfj"
+		}`)
+
+	malformedCurrency3 := strings.NewReader(`{
+		"baseCurrency": "alskdfjs",
+		"targetCurrency": "skdfs"
+		}`)
+
+	malformedBody := strings.NewReader(`{
+		"baseCurrency": "EUR"
+		}`)
+
+	// assert currency codes
+	resp := reqTest(t, ts, "", http.MethodPost, valid, http.StatusOK, "trying to request average currency info with valid POST")
+	reqTest(t, ts, "", http.MethodPost, malformedCurrency1, http.StatusBadRequest, "trying to request average currency info with invalid currency in POST")
+	reqTest(t, ts, "", http.MethodPost, malformedCurrency2, http.StatusBadRequest, "trying to request average currency info with invalid currency in POST")
+	reqTest(t, ts, "", http.MethodPost, malformedCurrency3, http.StatusBadRequest, "trying to request average currency info with invalid currencies in POST")
+	reqTest(t, ts, "", http.MethodPost, malformedBody, http.StatusBadRequest, "trying to request with malformed body (json malformed)")
+	reqTest(t, ts, "", http.MethodGet, http.NoBody, http.StatusNotImplemented, "trying to request non-supported method on average")
+
+	// assert that resp from valid request is a number
+	if resp == nil {
+		t.Error("nil response returned from valid request")
+		return
+	}
+
+	// assert that body is a single float32
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Error("error converting body in response to []byte")
+		return
+	}
+
+	number, err := strconv.ParseFloat(string(b), 32)
+	if err != nil {
+		t.Error("response from valid latest request isn't int")
+		return
+	}
+	number32 := float32(number)
+
+	// assert that it's the correct value
+	if number32 != monitor.nextVal {
+		t.Errorf("average request returned wrong number. Got: %s, wanted: %s", number, monitor.nextVal)
 		return
 	}
 }
