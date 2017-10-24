@@ -4,12 +4,16 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
 
 	// (try to) get the port from heroku config vars
 	port := getENV("PORT")
+	//schHour := getENV("SCHEDULE_HOUR")
+	//schMinute := getENV("SCHEDULE_MINUTE")
+	//schSecond := getENV("SCHEDULE_SECOND")
 
 	// set up handler (TODO will use real db and monitor eventually)
 	db := VolatileSubscriberDBFactory()
@@ -35,8 +39,11 @@ func main() {
 		handler.monitor.Update()
 		handler.notifyAll()
 
-		// calculate time until next update/notify and sleep
-		break // DEBUG
+		/*
+			dur := durUntilTime(schHour, schMinute, schSecond)
+			time.Sleep(dur)
+		*/
+		break // TODO
 	}
 }
 
@@ -48,4 +55,29 @@ func getENV(name string) string {
 	}
 	fmt.Println("Read env ", name, " = ", ret)
 	return ret
+}
+
+// calculate duration until next HH:MM:SS
+func durUntilClock(hour, minute, second int) time.Duration {
+	t := time.Now()
+
+	// the time this HH:MM:SS is happening
+	when := time.Date(t.Year(), t.Month(), t.Day(), hour,
+		minute, second, 0, t.Location())
+
+	// d is the time until next such time
+	d := when.Sub(t)
+
+	// if duration is negative, add a day
+	if d < 0 {
+		when = when.Add(24 * time.Hour)
+		d = when.Sub(t)
+	}
+
+	return d
+}
+
+// calculate duration until time is when
+func durUntilTime(when time.Time) time.Duration {
+	return when.Sub(time.Now())
 }
