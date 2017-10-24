@@ -3,3 +3,5 @@
 Links:
 * [Assignement instructions](/instructions.md)
 * [The service](https://imt2681-assignement-2.herokuapp.com/)
+
+*(This repo is WIP. Explanation and usage-examples will be added as the repo matures)*
