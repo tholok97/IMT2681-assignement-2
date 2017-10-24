@@ -1,7 +1,5 @@
 package main
 
-import "errors"
-
 // StubCurrencyMonitor fakes the behavior expected by a CurrencyMonitor. Used
 //	for testing. The fields are used to determine the outcome of the methods.
 type StubCurrencyMonitor struct {
@@ -9,8 +7,6 @@ type StubCurrencyMonitor struct {
 	nextVal    float32
 	validCurrs []string
 }
-
-var errInvalidCurrency = errors.New("currency used is not valid")
 
 // generate new currency monitor stub
 func StubCurrencyMonitorFactory(err error, nextVal float32) StubCurrencyMonitor {
