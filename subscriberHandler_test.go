@@ -277,6 +277,7 @@ func TestSubscriberHandler_handleLatest(t *testing.T) {
 	reqTest(t, ts, "", http.MethodPost, malformedCurrency2, http.StatusBadRequest, "trying to request latest currency info with invalid currency in POST")
 	reqTest(t, ts, "", http.MethodPost, malformedCurrency3, http.StatusBadRequest, "trying to request latest currency info with invalid currencies in POST")
 	reqTest(t, ts, "", http.MethodPost, malformedBody, http.StatusBadRequest, "trying to request with malformed body (json malformed)")
+	reqTest(t, ts, "", http.MethodGet, http.NoBody, http.StatusNotImplemented, "trying to request non-supported method on latest")
 
 	// assert that resp from valid request is a number
 	if resp == nil {
