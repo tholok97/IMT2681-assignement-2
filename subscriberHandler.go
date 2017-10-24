@@ -24,6 +24,7 @@ func SubscriberHandlerFactory(db SubscriberDB, monitor CurrencyMonitor) Subscrib
 }
 
 func (handler *SubscriberHandler) handleSubscriberRequestPOST(res http.ResponseWriter, req *http.Request) {
+
 	// attempt to decode the POST json
 	var s Subscriber
 	err := json.NewDecoder(req.Body).Decode(&s)
@@ -141,7 +142,43 @@ func (handler *SubscriberHandler) handleSubscriberRequest(res http.ResponseWrite
 
 // handle requests about latests data
 func (handler *SubscriberHandler) handleLatest(res http.ResponseWriter, req *http.Request) {
-	respWithCode(&res, http.StatusNotImplemented)
+
+	// ..only supports POST method
+	if req.Method != http.MethodPost {
+		respWithCode(&res, http.StatusNotImplemented)
+	}
+
+	// attempt to decode the POST json
+	var currReq CurrencyRequest
+	err := json.NewDecoder(req.Body).Decode(&currReq)
+
+	// if couldn't decode -> bad req
+	if err != nil {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	}
+
+	// check validity of posted json
+	if !validateCurrencyRequest(currReq) {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	}
+
+	// (try to) add the student
+	rate, rateErr := handler.monitor.Latest(*currReq.BaseCurrency, *currReq.TargetCurrency)
+
+	// if couldn't get latest -> either not found or internal error
+	//  (client's responsability to retry)
+	if rateErr == errInvalidCurrency {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	} else if rateErr != nil {
+		respWithCode(&res, http.StatusInternalServerError)
+		return
+	}
+
+	// respond with id given by db
+	fmt.Fprint(res, rate)
 }
 
 // handle requests about average data
