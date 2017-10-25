@@ -15,7 +15,10 @@ func main() {
 	}
 
 	// set up handler (TODO will use real db and monitor eventually)
-	db := VolatileSubscriberDBFactory()
+	db, err := SubscriberMongoDBFactory("localhost", "assignement_2", "subscribers")
+	if err != nil {
+		panic(err.Error())
+	}
 	monitor := StubCurrencyMonitorFactory(nil, 1.6)
 	handler := SubscriberHandlerFactory(&db, &monitor)
 
@@ -26,7 +29,7 @@ func main() {
 
 	// start listening on port
 	fmt.Println("Listening on port " + port + "...")
-	err := http.ListenAndServe(":"+port, nil)
+	err = http.ListenAndServe(":"+port, nil)
 
 	// if we couldn't set up the server, give up
 	if err != nil {
