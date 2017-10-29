@@ -8,6 +8,17 @@ import (
 
 func main() {
 
+	fios := FixerIOStorage{
+		DatabaseURL:    "localhost",
+		DatabaseName:   "assignement_2",
+		CollectionName: "currencies",
+	}
+
+	supererr := fios.Update("http://api.fixer.io")
+	if supererr != nil {
+		panic(supererr.Error())
+	}
+
 	// (try to) get the port from heroku config vars
 	port := os.Getenv("PORT")
 	if port == "" {
