@@ -206,7 +206,7 @@ func (handler *SubscriberHandler) handleAverage(res http.ResponseWriter, req *ht
 	}
 
 	// (try to) get the average currency info for the last 7 days
-	rate, rateErr := handler.monitor.Average(*currReq.BaseCurrency, *currReq.TargetCurrency, 7)
+	rate, rateErr := handler.monitor.Average(*currReq.BaseCurrency, *currReq.TargetCurrency)
 
 	// if couldn't get average -> either not found or internal error
 	//  (client's responsability to retry)

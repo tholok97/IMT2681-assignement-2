@@ -36,8 +36,7 @@ func (monitor *StubCurrencyMonitor) Latest(curr1, curr2 string) (float32,
 }
 
 // Average currency (faked)
-func (monitor *StubCurrencyMonitor) Average(curr1, curr2 string,
-	days int) (float32, error) {
+func (monitor *StubCurrencyMonitor) Average(curr1, curr2 string) (float32, error) {
 
 	if !isIn(curr1, monitor.validCurrs) || !isIn(curr2, monitor.validCurrs) {
 		return 923, errInvalidCurrency

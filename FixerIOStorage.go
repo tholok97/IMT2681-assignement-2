@@ -5,6 +5,7 @@ import (
 	"time"
 
 	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type FixerIOStorage struct {
@@ -114,6 +115,51 @@ func generateAverage(url string) (map[string]float32, error) {
 	temp["EUR"] = 1
 
 	return temp, nil
+}
+
+func (fios *FixerIOStorage) getRate(curr1, curr2, name string) (float32, error) {
+
+	// fetch rates from mongodb
+	session, err := mgo.Dial(fios.DatabaseURL)
+	if err != nil {
+		return 923, err
+	}
+	defer session.Close()
+
+	var mrate MongoRate
+	err = session.DB(fios.DatabaseName).C(fios.CollectionName).Find(bson.M{"name": name}).One(&mrate)
+	if err != nil {
+		return 923, err
+	}
+
+	// calculate rate
+	rate1, ok1 := mrate.Rates[curr1]
+	rate2, ok2 := mrate.Rates[curr2]
+	if !ok1 || !ok2 {
+		return 923, errInvalidCurrency
+	}
+
+	return rate2 / rate1, nil
+}
+
+func (fios *FixerIOStorage) Latest(curr1, curr2 string) (float32, error) {
+
+	rate, err := fios.getRate(curr1, curr2, "latest")
+	if err != nil {
+		return 923, err
+	}
+
+	return rate, nil
+}
+
+func (fios *FixerIOStorage) Average(curr1, curr2 string) (float32, error) {
+
+	rate, err := fios.getRate(curr1, curr2, "average")
+	if err != nil {
+		return 923, err
+	}
+
+	return rate, nil
 }
 
 type MongoRate struct {

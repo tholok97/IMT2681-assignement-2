@@ -8,17 +8,6 @@ import (
 
 func main() {
 
-	fios := FixerIOStorage{
-		DatabaseURL:    "localhost",
-		DatabaseName:   "assignement_2",
-		CollectionName: "currencies",
-	}
-
-	supererr := fios.Update("http://api.fixer.io")
-	if supererr != nil {
-		panic(supererr.Error())
-	}
-
 	// (try to) get the port from heroku config vars
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -27,7 +16,14 @@ func main() {
 
 	// set up handler (TODO will use real db and monitor eventually)
 	db := VolatileSubscriberDBFactory()
-	monitor := StubCurrencyMonitorFactory(nil, 1.6)
+	monitor := FixerIOStorage{
+		DatabaseURL:    "localhost",
+		DatabaseName:   "assignement_2",
+		CollectionName: "currencies",
+	}
+
+	monitor.Update("http://api.fixer.io")
+
 	handler := SubscriberHandlerFactory(&db, &monitor)
 
 	// set up handlerfuncs
