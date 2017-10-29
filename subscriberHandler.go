@@ -222,6 +222,42 @@ func (handler *SubscriberHandler) handleAverage(res http.ResponseWriter, req *ht
 	fmt.Fprint(res, rate)
 }
 
+// handler (for testing and debug mostly) that forces all subscribers to be notfied
+func (handler *SubscriberHandler) handleEvaluationTrigger(res http.ResponseWriter, req *http.Request) {
+
+	// only GET supported
+	if req.Method != http.MethodGet {
+		respWithCode(&res, http.StatusNotImplemented)
+		return
+	}
+
+	// notify all subscribers
+	err := handler.notifyAll()
+
+	if err != nil {
+		respWithCode(&res, http.StatusInternalServerError)
+		return
+	}
+}
+
+// notify all subscribers
+func (handler *SubscriberHandler) notifyAll() error {
+	subs, err := handler.db.GetAll()
+	if err != nil {
+		return err
+	}
+	for _, s := range subs {
+		handler.notifySubscriber(s)
+	}
+	return nil
+}
+
+// notify single subscriber
+func (handler *SubscriberHandler) notifySubscriber(s Subscriber) {
+	// TODO implement notifications
+	fmt.Println("Notifying ", *s.WebhookURL)
+}
+
 // utility function for responding with a simple statuscode
 func respWithCode(res *http.ResponseWriter, status int) {
 	http.Error(*res, http.StatusText(status), status)
