@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 )
 
@@ -16,6 +14,8 @@ func main() {
 	schMinute := getIntENV("SCHEDULE_MINUTE")
 	schSecond := getIntENV("SCHEDULE_SECOND")
 	fixerIOURL := getENV("FIXER_IO_URL")
+	mongoDBURL := getENV("MONGO_DB_URL")
+	mongoDBDatabaseName := getENV("MONGO_DB_CURRENCY_DATABASE_NAME")
 
 	// set up handler (TODO will use real db and monitor eventually)
 	db, err := SubscriberMongoDBFactory("localhost", "assignement_2", "subscribers")
@@ -23,14 +23,17 @@ func main() {
 		panic(err.Error())
 	}
 	monitor := FixerIOStorage{
-		DatabaseURL:    "localhost",
-		DatabaseName:   "assignement_2",
+		DatabaseURL:    mongoDBURL,
+		DatabaseName:   mongoDBDatabaseName,
 		CollectionName: "currencies",
 		FixerIOURL:     fixerIOURL,
 	}
+	err = monitor.Update()
+	if err != nil {
+		panic("couldn't first-time-update monitor: " + err.Error())
+	}
 
-	monitor.Update()
-
+	// set up handler
 	handler := SubscriberHandlerFactory(&db, &monitor)
 
 	// set up handlerfuncs
@@ -56,49 +59,4 @@ func main() {
 		dur := durUntilClock(schHour, schMinute, schSecond)
 		time.Sleep(dur)
 	}
-}
-
-// get environment variable. If something goes wrong: PANIC
-func getENV(name string) string {
-	ret := os.Getenv(name)
-	if ret == "" {
-		panic("Missing env variable: " + ret)
-	}
-	fmt.Println("Read env ", name, " = ", ret)
-	return ret
-}
-
-// get environment variable as int. If something goes wrong: PANIC
-func getIntENV(name string) int {
-	ret := getENV(name)
-	num, err := strconv.Atoi(ret)
-	if err != nil {
-		panic("Error converting env to int: " + err.Error())
-	}
-	return num
-}
-
-// calculate duration until next HH:MM:SS
-func durUntilClock(hour, minute, second int) time.Duration {
-	t := time.Now()
-
-	// the time this HH:MM:SS is happening
-	when := time.Date(t.Year(), t.Month(), t.Day(), hour,
-		minute, second, 0, t.Location())
-
-	// d is the time until next such time
-	d := when.Sub(t)
-
-	// if duration is negative, add a day
-	if d < 0 {
-		when = when.Add(24 * time.Hour)
-		d = when.Sub(t)
-	}
-
-	return d
-}
-
-// calculate duration until time is when
-func durUntilTime(when time.Time) time.Duration {
-	return when.Sub(time.Now())
 }

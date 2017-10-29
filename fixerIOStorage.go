@@ -1,13 +1,19 @@
 package main
 
+/*
+ * WARNING: This file is pretty ad-hoc, as the deadline is approaching fast,
+	and I need this feature for the project to work
+*/
+
 import (
-	"fmt"
 	"time"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
+// FixerIOStorage is an implementation of CurrencyMonitor that stores it's
+// currencies in mongodb and gets them from fixer.io
 type FixerIOStorage struct {
 	DatabaseURL    string
 	DatabaseName   string
@@ -15,19 +21,17 @@ type FixerIOStorage struct {
 	FixerIOURL     string
 }
 
+// Update the mongodb database by fetching data from url
 func (fios *FixerIOStorage) Update() error {
 
 	// delete old entry
 	session, err := mgo.Dial(fios.DatabaseURL)
+	if err != nil {
+		return err
+	}
 	defer session.Close()
-	if err != nil {
-		return err
-	}
 
-	err = session.DB(fios.DatabaseName).DropDatabase()
-	if err != nil {
-		return err
-	}
+	session.DB(fios.DatabaseName).C(fios.CollectionName).DropCollection()
 
 	// UPDATE LATEST
 
@@ -52,7 +56,6 @@ func (fios *FixerIOStorage) Update() error {
 
 	err = session.DB(fios.DatabaseName).C(fios.CollectionName).Insert(mRates)
 	if err != nil {
-		fmt.Printf("error in Insert(): %v", err.Error())
 		return err
 	}
 
@@ -73,7 +76,6 @@ func (fios *FixerIOStorage) Update() error {
 
 	err = session.DB(fios.DatabaseName).C(fios.CollectionName).Insert(mRates)
 	if err != nil {
-		fmt.Printf("error in Insert(): %v", err.Error())
 		return err
 	}
 
@@ -143,6 +145,7 @@ func (fios *FixerIOStorage) getRate(curr1, curr2, name string) (float32, error) 
 	return rate2 / rate1, nil
 }
 
+// Latest rate beteween curr1 and curr2
 func (fios *FixerIOStorage) Latest(curr1, curr2 string) (float32, error) {
 
 	rate, err := fios.getRate(curr1, curr2, "latest")
@@ -153,6 +156,7 @@ func (fios *FixerIOStorage) Latest(curr1, curr2 string) (float32, error) {
 	return rate, nil
 }
 
+// Average rate between curr1 and curr2
 func (fios *FixerIOStorage) Average(curr1, curr2 string) (float32, error) {
 
 	rate, err := fios.getRate(curr1, curr2, "average")
@@ -163,7 +167,8 @@ func (fios *FixerIOStorage) Average(curr1, curr2 string) (float32, error) {
 	return rate, nil
 }
 
+// MongoRate represents how how rates are stored in mongodb
 type MongoRate struct {
-	Name  string             `name`
-	Rates map[string]float32 `rates`
+	Name  string             `json:"name"`
+	Rates map[string]float32 `json:"rates"`
 }

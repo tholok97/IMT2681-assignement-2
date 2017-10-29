@@ -20,6 +20,8 @@ func (f *faker) fakeGetter(url string) ([]byte, error) {
 	return b, f.err
 }
 
+// Test the fetcher (veeeery ad-hoc code. Just needed to make sure it works in best-case scenario)
+// TODO add more tests
 func TestFetchFixerIO(t *testing.T) {
 
 	payload := FixerIOPayload{Base: "EUR", Date: "2014-03-04", Rates: map[string]float32{"NOK": 9.4, "URD": 1.4}}
