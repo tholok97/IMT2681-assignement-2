@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	mgo "gopkg.in/mgo.v2"
 )
@@ -36,6 +37,7 @@ func (fios *FixerIOStorage) Update(url string) error {
 
 	// fetch info we want
 	rates := payload.Rates
+	rates["EUR"] = 1
 
 	mRates := MongoRate{Name: "latest", Rates: rates}
 
@@ -54,6 +56,9 @@ func (fios *FixerIOStorage) Update(url string) error {
 
 	// UPDATE AVERAGE
 	average, err := generateAverage(url)
+	if err != nil {
+		return err
+	}
 
 	mRates = MongoRate{Name: "average", Rates: average}
 
@@ -75,7 +80,40 @@ func (fios *FixerIOStorage) Update(url string) error {
 
 func generateAverage(url string) (map[string]float32, error) {
 
-	return map[string]float32{"EUR": 923}, nil
+	payload, err := fetchFixerIO(url+"/latest?base=EUR", getJSON)
+	if err != nil {
+		return nil, err
+	}
+	temp := payload.Rates
+
+	t := time.Now()
+
+	// get for last 7 days
+	for i := 0; i < 6; i++ {
+		t = t.AddDate(0, 0, -1)
+		date := t.Format("2006-01-02")
+
+		payload, err := fetchFixerIO(url+"/"+date+"?base=EUR", getJSON)
+		if err != nil {
+			return nil, err
+		}
+
+		rateForDay := payload.Rates
+		for k, v := range rateForDay {
+			temp[k] += v
+		}
+	}
+
+	// do average
+
+	for k := range temp {
+		temp[k] /= 7
+	}
+
+	// ..add EUR (=1)
+	temp["EUR"] = 1
+
+	return temp, nil
 }
 
 type MongoRate struct {
