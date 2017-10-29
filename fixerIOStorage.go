@@ -32,7 +32,7 @@ func (fios *FixerIOStorage) Update() error {
 		return err
 	}
 
-	err = session.DB(fios.DatabaseName).DropDatabase()
+	err = session.DB(fios.DatabaseName).C(fios.CollectionName).DropCollection()
 	if err != nil {
 		return err
 	}

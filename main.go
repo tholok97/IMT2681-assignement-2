@@ -25,7 +25,10 @@ func main() {
 		CollectionName: "currencies",
 		FixerIOURL:     fixerIOURL,
 	}
-	monitor.Update()
+	err := monitor.Update()
+	if err != nil {
+		panic("couldn't first-time-update monitor: " + err.Error())
+	}
 
 	// set up handler
 	handler := SubscriberHandlerFactory(&db, &monitor)
@@ -38,7 +41,7 @@ func main() {
 
 	// start listening on port
 	fmt.Println("Listening on port " + port + "...")
-	err := http.ListenAndServe(":"+port, nil)
+	err = http.ListenAndServe(":"+port, nil)
 
 	// if we couldn't set up the server, give up
 	if err != nil {
