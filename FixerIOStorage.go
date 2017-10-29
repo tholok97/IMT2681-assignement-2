@@ -12,9 +12,10 @@ type FixerIOStorage struct {
 	DatabaseURL    string
 	DatabaseName   string
 	CollectionName string
+	FixerIOURL     string
 }
 
-func (fios *FixerIOStorage) Update(url string) error {
+func (fios *FixerIOStorage) Update() error {
 
 	// delete old entry
 	session, err := mgo.Dial(fios.DatabaseURL)
@@ -31,7 +32,7 @@ func (fios *FixerIOStorage) Update(url string) error {
 	// UPDATE LATEST
 
 	// get payload
-	payload, err := fetchFixerIO(url+"/latest?base=EUR", getJSON)
+	payload, err := fetchFixerIO(fios.FixerIOURL+"/latest?base=EUR", getJSON)
 	if err != nil {
 		return err
 	}
@@ -56,7 +57,7 @@ func (fios *FixerIOStorage) Update(url string) error {
 	}
 
 	// UPDATE AVERAGE
-	average, err := generateAverage(url)
+	average, err := generateAverage(fios.FixerIOURL)
 	if err != nil {
 		return err
 	}

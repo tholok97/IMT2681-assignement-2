@@ -8,10 +8,14 @@ import (
 
 func main() {
 
-	// (try to) get the port from heroku config vars
+	// (try to) get the envs
 	port := os.Getenv("PORT")
 	if port == "" {
 		panic("No port specified")
+	}
+	fixerIOURL := os.Getenv("FIXER_IO_URL")
+	if fixerIOURL == "" {
+		panic("No fixerIOURL specified")
 	}
 
 	// set up handler (TODO will use real db and monitor eventually)
@@ -20,9 +24,10 @@ func main() {
 		DatabaseURL:    "localhost",
 		DatabaseName:   "assignement_2",
 		CollectionName: "currencies",
+		FixerIOURL:     fixerIOURL,
 	}
 
-	monitor.Update("http://api.fixer.io")
+	monitor.Update()
 
 	handler := SubscriberHandlerFactory(&db, &monitor)
 
