@@ -20,7 +20,7 @@ func main() {
 	// set up db
 	db, err := SubscriberMongoDBFactory(mongoDBURL, mongoDBDatabaseName)
 	if err != nil {
-		panic("couldn't set up db", err.Error())
+		panic("couldn't set up db" + err.Error())
 	}
 
 	// set up monitor
