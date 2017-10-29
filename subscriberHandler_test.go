@@ -300,7 +300,7 @@ func TestSubscriberHandler_handleLatest(t *testing.T) {
 
 	// assert that it's the correct value
 	if number32 != monitor.nextVal {
-		t.Errorf("latest request returned wrong number. Got: %s, wanted: %s", number, monitor.nextVal)
+		t.Errorf("latest request returned wrong number. Got: %v, wanted: %v", number, monitor.nextVal)
 		return
 	}
 }
@@ -372,7 +372,7 @@ func TestSubscriberHandler_handleAverage(t *testing.T) {
 
 	// assert that it's the correct value
 	if number32 != monitor.nextVal {
-		t.Errorf("average request returned wrong number. Got: %s, wanted: %s", number, monitor.nextVal)
+		t.Errorf("average request returned wrong number. Got: %v, wanted: %v", number, monitor.nextVal)
 		return
 	}
 }

@@ -8,7 +8,7 @@ type StubCurrencyMonitor struct {
 	validCurrs []string
 }
 
-// generate new currency monitor stub
+// StubCurrencyMonitorFactory generates new currency monitor stub
 func StubCurrencyMonitorFactory(err error, nextVal float32) StubCurrencyMonitor {
 	monitor := StubCurrencyMonitor{err: err, nextVal: nextVal}
 	monitor.validCurrs = []string{

@@ -2,10 +2,15 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"strconv"
+	"time"
 )
 
+// returns a struct representing the payload returned from fixerIO with the given url
 func fetchFixerIO(url string, jsonGetter func(url string) ([]byte, error)) (FixerIOPayload, error) {
 
 	// get the json as bytes
@@ -23,9 +28,9 @@ func fetchFixerIO(url string, jsonGetter func(url string) ([]byte, error)) (Fixe
 
 // FixerIOPayload contains response from FixerIO
 type FixerIOPayload struct {
-	Base  string             `base`
-	Date  string             `date`
-	Rates map[string]float32 `rates`
+	Base  string             `json:"base"`
+	Date  string             `json:"date"`
+	Rates map[string]float32 `json:"rates"`
 }
 
 // gets json as []byte from a given url
@@ -47,4 +52,49 @@ func getJSON(url string) ([]byte, error) {
 	}
 
 	return bodyBytes, nil
+}
+
+// get environment variable. If something goes wrong: PANIC
+func getENV(name string) string {
+	ret := os.Getenv(name)
+	if ret == "" {
+		panic("Missing env variable: " + ret)
+	}
+	fmt.Println("Read env ", name, " = ", ret)
+	return ret
+}
+
+// get environment variable as int. If something goes wrong: PANIC
+func getIntENV(name string) int {
+	ret := getENV(name)
+	num, err := strconv.Atoi(ret)
+	if err != nil {
+		panic("Error converting env to int: " + err.Error())
+	}
+	return num
+}
+
+// calculate duration until next HH:MM:SS
+func durUntilClock(hour, minute, second int) time.Duration {
+	t := time.Now()
+
+	// the time this HH:MM:SS is happening
+	when := time.Date(t.Year(), t.Month(), t.Day(), hour,
+		minute, second, 0, t.Location())
+
+	// d is the time until next such time
+	d := when.Sub(t)
+
+	// if duration is negative, add a day
+	if d < 0 {
+		when = when.Add(24 * time.Hour)
+		d = when.Sub(t)
+	}
+
+	return d
+}
+
+// calculate duration until time is when
+func durUntilTime(when time.Time) time.Duration {
+	return when.Sub(time.Now())
 }

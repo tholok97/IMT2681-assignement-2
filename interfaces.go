@@ -11,7 +11,7 @@ type SubscriberDB interface {
 	GetAll() ([]Subscriber, error)
 }
 
-// CurrencyMontitor defines how something that monitors currency behaves
+// CurrencyMonitor defines how something that monitors currency behaves
 type CurrencyMonitor interface {
 	Update() error
 	Latest(curr1, curr2 string) (float32, error)
