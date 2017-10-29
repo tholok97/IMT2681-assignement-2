@@ -54,7 +54,7 @@ func (db *SubscriberMongoDB) Remove(id string) error {
 	}
 	defer session.Close()
 
-	err = session.DB(db.Name).C(db.SubscriberCollectionName).RemoveId(id)
+	err = session.DB(db.Name).C(db.SubscriberCollectionName).RemoveId(bson.ObjectIdHex(id))
 	if err != nil {
 		return err
 	}
@@ -92,10 +92,24 @@ func (db *SubscriberMongoDB) Get(id string) (Subscriber, error) {
 	if err != nil {
 		return Subscriber{}, err
 	}
+
 	return sub, nil
 }
 
 // GetAll gets all subscribers as slice
 func (db *SubscriberMongoDB) GetAll() ([]Subscriber, error) {
-	return nil, nil
+
+	session, err := mgo.Dial(db.URL)
+	if err != nil {
+		return nil, err
+	}
+	defer session.Close()
+
+	subs := make([]Subscriber, 0)
+	err = session.DB(db.Name).C(db.SubscriberCollectionName).Find(nil).All(&subs)
+	if err != nil {
+		return nil, err
+	}
+
+	return subs, nil
 }
