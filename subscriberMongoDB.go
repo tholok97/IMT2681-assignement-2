@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -19,6 +17,7 @@ func SubscriberMongoDBFactory(url, name string) (SubscriberMongoDB, error) {
 
 	db := SubscriberMongoDB{URL: url, Name: name, SubscriberCollectionName: "subscribers"}
 
+	// assert that session is possible
 	session, err := mgo.Dial(db.URL)
 	if err != nil {
 		return SubscriberMongoDB{}, nil
@@ -36,13 +35,12 @@ func (db *SubscriberMongoDB) Add(s Subscriber) (string, error) {
 	}
 	defer session.Close()
 
+	// generate new ID and insert
 	s.ID = bson.NewObjectId()
 	err = session.DB(db.Name).C(db.SubscriberCollectionName).Insert(s)
 	if err != nil {
 		return "", err
 	}
-
-	fmt.Println("id: ", s.ID.Hex())
 
 	return s.ID.Hex(), nil
 }
