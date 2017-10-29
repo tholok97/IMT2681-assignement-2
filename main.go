@@ -4,28 +4,40 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 )
 
 func main() {
 
 	// (try to) get the port from heroku config vars
-	port := os.Getenv("PORT")
-	if port == "" {
-		panic("No port specified")
-	}
+	port := getENV("PORT")
+	schHour := getIntENV("SCHEDULE_HOUR")
+	schMinute := getIntENV("SCHEDULE_MINUTE")
+	schSecond := getIntENV("SCHEDULE_SECOND")
+	fixerIOURL := getENV("FIXER_IO_URL")
 
 	// set up handler (TODO will use real db and monitor eventually)
 	db, err := SubscriberMongoDBFactory("localhost", "assignement_2", "subscribers")
 	if err != nil {
 		panic(err.Error())
 	}
-	monitor := StubCurrencyMonitorFactory(nil, 1.6)
+	monitor := FixerIOStorage{
+		DatabaseURL:    "localhost",
+		DatabaseName:   "assignement_2",
+		CollectionName: "currencies",
+		FixerIOURL:     fixerIOURL,
+	}
+
+	monitor.Update()
+
 	handler := SubscriberHandlerFactory(&db, &monitor)
 
 	// set up handlerfuncs
 	http.HandleFunc("/", handler.handleSubscriberRequest)
 	http.HandleFunc("/latest", handler.handleLatest)
 	http.HandleFunc("/average", handler.handleAverage)
+	http.HandleFunc("/evaluationtrigger", handler.handleEvaluationTrigger)
 
 	// start listening on port
 	fmt.Println("Listening on port " + port + "...")
@@ -35,4 +47,58 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	// update monitor -> notify -> sleep
+	for {
+		handler.monitor.Update()
+		handler.notifyAll()
+
+		dur := durUntilClock(schHour, schMinute, schSecond)
+		time.Sleep(dur)
+	}
+}
+
+// get environment variable. If something goes wrong: PANIC
+func getENV(name string) string {
+	ret := os.Getenv(name)
+	if ret == "" {
+		panic("Missing env variable: " + ret)
+	}
+	fmt.Println("Read env ", name, " = ", ret)
+	return ret
+}
+
+// get environment variable as int. If something goes wrong: PANIC
+func getIntENV(name string) int {
+	ret := getENV(name)
+	num, err := strconv.Atoi(ret)
+	if err != nil {
+		panic("Error converting env to int: " + err.Error())
+	}
+	return num
+}
+
+// calculate duration until next HH:MM:SS
+func durUntilClock(hour, minute, second int) time.Duration {
+	t := time.Now()
+
+	// the time this HH:MM:SS is happening
+	when := time.Date(t.Year(), t.Month(), t.Day(), hour,
+		minute, second, 0, t.Location())
+
+	// d is the time until next such time
+	d := when.Sub(t)
+
+	// if duration is negative, add a day
+	if d < 0 {
+		when = when.Add(24 * time.Hour)
+		d = when.Sub(t)
+	}
+
+	return d
+}
+
+// calculate duration until time is when
+func durUntilTime(when time.Time) time.Duration {
+	return when.Sub(time.Now())
 }
