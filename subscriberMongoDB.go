@@ -7,13 +7,14 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// SubscriberMongoDB implements SubscriberDB using mongodb (persistant)
 type SubscriberMongoDB struct {
 	URL                      string
 	Name                     string
 	SubscriberCollectionName string
 }
 
-// SubscriberMongoDB returns a fresh SubscriberMongoDB
+// SubscriberMongoDBFactory returns a fresh SubscriberMongoDB
 func SubscriberMongoDBFactory(url, name string) (SubscriberMongoDB, error) {
 
 	db := SubscriberMongoDB{URL: url, Name: name, SubscriberCollectionName: "subscribers"}
