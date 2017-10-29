@@ -1,12 +1,5 @@
 package main
 
-import (
-	"errors"
-)
-
-// error vars (so user can detect what kind of error occured and react on it)
-var errNotFound = errors.New("subscriber not found")
-
 // VolatileSubscriberDB is a subscriber database that uses volatile memory.
 // used for testing
 type VolatileSubscriberDB struct {

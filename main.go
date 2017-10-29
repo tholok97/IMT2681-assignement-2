@@ -3,32 +3,59 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
+	"time"
 )
 
 func main() {
 
 	// (try to) get the port from heroku config vars
-	port := os.Getenv("PORT")
-	if port == "" {
-		panic("No port specified")
+	port := getENV("PORT")
+	schHour := getIntENV("SCHEDULE_HOUR")
+	schMinute := getIntENV("SCHEDULE_MINUTE")
+	schSecond := getIntENV("SCHEDULE_SECOND")
+	fixerIOURL := getENV("FIXER_IO_URL")
+	mongoDBURL := getENV("MONGO_DB_URL")
+	mongoDBDatabaseName := getENV("MONGO_DB_CURRENCY_DATABASE_NAME")
+
+	// set up db
+	db := VolatileSubscriberDBFactory()
+
+	// set up monitor
+	monitor := FixerIOStorage{
+		DatabaseURL:    mongoDBURL,
+		DatabaseName:   mongoDBDatabaseName,
+		CollectionName: "currencies",
+		FixerIOURL:     fixerIOURL,
+	}
+	err := monitor.Update()
+	if err != nil {
+		panic("couldn't first-time-update monitor: " + err.Error())
 	}
 
-	// set up handler (TODO: db will be changed to a mongodb one eventually)
-	db := VolatileSubscriberDBFactory()
-	handler := SubscriberHandlerFactory(&db)
+	// set up handler
+	handler := SubscriberHandlerFactory(&db, &monitor)
 
 	// set up handlerfuncs
 	http.HandleFunc("/", handler.handleSubscriberRequest)
-	http.HandleFunc("/latest/", handler.handleLatest)
-	http.HandleFunc("/average/", handler.handleAverage)
+	http.HandleFunc("/latest", handler.handleLatest)
+	http.HandleFunc("/average", handler.handleAverage)
+	http.HandleFunc("/evaluationtrigger", handler.handleEvaluationTrigger)
 
 	// start listening on port
 	fmt.Println("Listening on port " + port + "...")
-	err := http.ListenAndServe(":"+port, nil)
+	err = http.ListenAndServe(":"+port, nil)
 
 	// if we couldn't set up the server, give up
 	if err != nil {
 		panic(err)
+	}
+
+	// update monitor -> notify -> sleep
+	for {
+		handler.monitor.Update()
+		handler.notifyAll()
+
+		dur := durUntilClock(schHour, schMinute, schSecond)
+		time.Sleep(dur)
 	}
 }
