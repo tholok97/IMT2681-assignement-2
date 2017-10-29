@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"testing"
 )
 
@@ -67,8 +68,8 @@ func TestVolatileSubscriberDB_Remove(t *testing.T) {
 	s1 := generateTestSubscriber("1")
 
 	// test id's
-	id1 := 2 // VALID
-	id2 := 3 // INVALID
+	id1 := "2" // VALID
+	id2 := "3" // INVALID
 
 	// add test subscriber to db
 	db.subscribers[id1] = s1
@@ -113,8 +114,8 @@ func TestVolatileSubscriberDB_Count(t *testing.T) {
 	}
 
 	// add a few subscribers
-	db.subscribers[1] = generateTestSubscriber("NOT RELEVANT")
-	db.subscribers[2] = generateTestSubscriber("NOT RELEVANT")
+	db.subscribers["1"] = generateTestSubscriber("NOT RELEVANT")
+	db.subscribers["2"] = generateTestSubscriber("NOT RELEVANT")
 
 	// assert that Count() is now 2
 	count, err = db.Count()
@@ -137,8 +138,8 @@ func TestVolatileSubscriberDB_Get(t *testing.T) {
 	s1 := generateTestSubscriber("1")
 
 	// test id's
-	id1 := 2 // VALID
-	id2 := 3 // INVALID
+	id1 := "2" // VALID
+	id2 := "3" // INVALID
 
 	// add test subscriber to db
 	db.subscribers[id1] = s1
@@ -174,7 +175,7 @@ func TestVolatileSubscriberDB_GetAll(t *testing.T) {
 
 	// add test subscribers to db
 	for i, s := range testSubs {
-		db.subscribers[i] = s
+		db.subscribers[strconv.Itoa(i)] = s
 	}
 
 	// getall, and check for errors

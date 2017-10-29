@@ -131,8 +131,8 @@ func TestSubscriberHandler_handleSubscriberRequest_GET(t *testing.T) {
 	defer ts.Close()
 
 	// test ids
-	validID := 1
-	invalidID := 2
+	validID := "1"
+	invalidID := "2"
 
 	// sneak stuff into the db
 	url := "testing"
@@ -140,20 +140,12 @@ func TestSubscriberHandler_handleSubscriberRequest_GET(t *testing.T) {
 	db.subscribers[validID] = testSub
 
 	// assert that request for valid id returns OK
-	resp := reqTest(t, ts, "/"+strconv.Itoa(validID), http.MethodGet, http.NoBody, http.StatusOK,
+	resp := reqTest(t, ts, "/"+validID, http.MethodGet, http.NoBody, http.StatusOK,
 		"GET valid id")
 
 	// assert that request for invalid id doesn't succeed
-	reqTest(t, ts, "/"+strconv.Itoa(invalidID), http.MethodGet, http.NoBody, http.StatusNotFound,
+	reqTest(t, ts, "/"+invalidID, http.MethodGet, http.NoBody, http.StatusNotFound,
 		"GET invalid id")
-
-	// assert that malformed request (non-number id) returns bad request
-	reqTest(t, ts, "/THISISNOTANIDxD", http.MethodGet, http.NoBody, http.StatusBadRequest,
-		"GET malformed id")
-
-	// assert that malformed request (no id) returns bad request
-	reqTest(t, ts, "", http.MethodGet, http.NoBody, http.StatusBadRequest,
-		"GET no id")
 
 	// test body of response from valid request:
 
@@ -188,8 +180,8 @@ func TestSubscriberHandler_handleSubscriberRequest_DELETE(t *testing.T) {
 	defer ts.Close()
 
 	// test ids
-	validID := 1
-	invalidID := 2
+	validID := "1"
+	invalidID := "2"
 
 	// sneak stuff into the db
 	url := "testing"
@@ -197,7 +189,7 @@ func TestSubscriberHandler_handleSubscriberRequest_DELETE(t *testing.T) {
 	db.subscribers[validID] = testSub
 
 	// assert that calling delete on valid id returns OK
-	reqTest(t, ts, "/"+strconv.Itoa(validID), http.MethodDelete,
+	reqTest(t, ts, "/"+validID, http.MethodDelete,
 		http.NoBody, http.StatusOK,
 		"trying to delete subscriber using valid id")
 
@@ -207,14 +199,9 @@ func TestSubscriberHandler_handleSubscriberRequest_DELETE(t *testing.T) {
 	}
 
 	// assert that deleting non-existant id returns error
-	reqTest(t, ts, "/"+strconv.Itoa(invalidID), http.MethodDelete,
+	reqTest(t, ts, "/"+invalidID, http.MethodDelete,
 		http.NoBody, http.StatusNotFound,
 		"trying to delete non-existant subscriber")
-
-	// assert that requesting a DELETE with malformed id returns error
-	reqTest(t, ts, "/THISISNOTANID", http.MethodDelete,
-		http.NoBody, http.StatusBadRequest,
-		"trying to DELETE with malformed id in GET request")
 }
 
 // assert that non-supported request to / returns not implemented
