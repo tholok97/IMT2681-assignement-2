@@ -6,7 +6,6 @@ package main
 */
 
 import (
-	"fmt"
 	"time"
 
 	mgo "gopkg.in/mgo.v2"
@@ -27,15 +26,12 @@ func (fios *FixerIOStorage) Update() error {
 
 	// delete old entry
 	session, err := mgo.Dial(fios.DatabaseURL)
+	if err != nil {
+		return err
+	}
 	defer session.Close()
-	if err != nil {
-		return err
-	}
 
-	err = session.DB(fios.DatabaseName).C(fios.CollectionName).DropCollection()
-	if err != nil {
-		return err
-	}
+	session.DB(fios.DatabaseName).C(fios.CollectionName).DropCollection()
 
 	// UPDATE LATEST
 
@@ -60,7 +56,6 @@ func (fios *FixerIOStorage) Update() error {
 
 	err = session.DB(fios.DatabaseName).C(fios.CollectionName).Insert(mRates)
 	if err != nil {
-		fmt.Printf("error in Insert(): %v", err.Error())
 		return err
 	}
 
@@ -81,7 +76,6 @@ func (fios *FixerIOStorage) Update() error {
 
 	err = session.DB(fios.DatabaseName).C(fios.CollectionName).Insert(mRates)
 	if err != nil {
-		fmt.Printf("error in Insert(): %v", err.Error())
 		return err
 	}
 

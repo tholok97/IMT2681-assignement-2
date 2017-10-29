@@ -14,14 +14,16 @@ func main() {
 	schMinute := getIntENV("SCHEDULE_MINUTE")
 	schSecond := getIntENV("SCHEDULE_SECOND")
 	fixerIOURL := getENV("FIXER_IO_URL")
+	mongoDBURL := getENV("MONGO_DB_URL")
+	mongoDBDatabaseName := getENV("MONGO_DB_CURRENCY_DATABASE_NAME")
 
 	// set up db
 	db := VolatileSubscriberDBFactory()
 
 	// set up monitor
 	monitor := FixerIOStorage{
-		DatabaseURL:    "localhost",
-		DatabaseName:   "assignement_2",
+		DatabaseURL:    mongoDBURL,
+		DatabaseName:   mongoDBDatabaseName,
 		CollectionName: "currencies",
 		FixerIOURL:     fixerIOURL,
 	}
