@@ -15,13 +15,15 @@ func main() {
 	schSecond := getIntENV("SCHEDULE_SECOND")
 	fixerIOURL := getENV("FIXER_IO_URL")
 	mongoDBURL := getENV("MONGO_DB_URL")
-	mongoDBDatabaseName := getENV("MONGO_DB_CURRENCY_DATABASE_NAME")
+	mongoDBDatabaseName := getENV("MONGO_DB_DATABASE_NAME")
 
-	// set up handler (TODO will use real db and monitor eventually)
-	db, err := SubscriberMongoDBFactory("localhost", "assignement_2", "subscribers")
+	// set up db
+	db, err := SubscriberMongoDBFactory(mongoDBURL, mongoDBDatabaseName)
 	if err != nil {
-		panic(err.Error())
+		panic("couldn't set up db", err.Error())
 	}
+
+	// set up monitor
 	monitor := FixerIOStorage{
 		DatabaseURL:    mongoDBURL,
 		DatabaseName:   mongoDBDatabaseName,

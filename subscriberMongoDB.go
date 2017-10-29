@@ -14,9 +14,9 @@ type SubscriberMongoDB struct {
 }
 
 // SubscriberMongoDB returns a fresh SubscriberMongoDB
-func SubscriberMongoDBFactory(url, name, collectionName string) (SubscriberMongoDB, error) {
+func SubscriberMongoDBFactory(url, name string) (SubscriberMongoDB, error) {
 
-	db := SubscriberMongoDB{URL: url, Name: name, SubscriberCollectionName: collectionName}
+	db := SubscriberMongoDB{URL: url, Name: name, SubscriberCollectionName: "subscribers"}
 
 	session, err := mgo.Dial(db.URL)
 	if err != nil {
