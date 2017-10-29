@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 )
 
@@ -72,15 +71,8 @@ func (handler *SubscriberHandler) handleSubscriberRequestGET(res http.ResponseWr
 		return
 	}
 
-	// convert (string) id to int
-	id, err := strconv.Atoi(parts[1])
-	if err != nil {
-		respWithCode(&res, http.StatusBadRequest)
-		return
-	}
-
 	// attempt to fetch subscriber with given id
-	sub, err := handler.db.Get(id)
+	sub, err := handler.db.Get(parts[1])
 	if err != nil {
 		respWithCode(&res, http.StatusNotFound)
 		return
@@ -106,15 +98,8 @@ func (handler *SubscriberHandler) handleSubscriberRequestDELETE(res http.Respons
 		return
 	}
 
-	// convert (string) id to int
-	id, err := strconv.Atoi(parts[1])
-	if err != nil {
-		respWithCode(&res, http.StatusBadRequest)
-		return
-	}
-
 	// attempt to delete the subscriber with id
-	err = handler.db.Remove(id)
+	err := handler.db.Remove(parts[1])
 	if err != nil {
 		respWithCode(&res, http.StatusNotFound)
 		return

@@ -4,10 +4,10 @@ import "errors"
 
 // SubscriberDB defines how a db in the system behaves
 type SubscriberDB interface {
-	Add(s Subscriber) (int, error)
-	Remove(id int) error
+	Add(s Subscriber) (string, error)
+	Remove(id string) error
 	Count() (int, error)
-	Get(id int) (Subscriber, error)
+	Get(id string) (Subscriber, error)
 	GetAll() ([]Subscriber, error)
 }
 

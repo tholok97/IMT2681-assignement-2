@@ -1,13 +1,16 @@
 package main
 
+import "gopkg.in/mgo.v2/bson"
+
 // Subscriber holds info about a subscriber to currency-info in the system
 // (fields are pointers to make validation of incomming requests trivial)
 type Subscriber struct {
-	WebhookURL      *string  `json:"webhookURL"`
-	BaseCurrency    *string  `json:"baseCurrency"`
-	TargetCurrency  *string  `json:"targetCurrency"`
-	MinTriggerValue *float32 `json:"minTriggerValue"`
-	MaxTriggerValue *float32 `json:"maxTriggerValue"`
+	ID              bson.ObjectId `json:"_id" bson:"_id,omitempty"`
+	WebhookURL      *string       `json:"webhookURL"`
+	BaseCurrency    *string       `json:"baseCurrency"`
+	TargetCurrency  *string       `json:"targetCurrency"`
+	MinTriggerValue *float32      `json:"minTriggerValue"`
+	MaxTriggerValue *float32      `json:"maxTriggerValue"`
 }
 
 // CurrencyPayload holds info sent to subscriber

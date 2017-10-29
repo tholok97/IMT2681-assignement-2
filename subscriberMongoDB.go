@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type SubscriberMongoDB struct {
@@ -23,55 +24,62 @@ func SubscriberMongoDBFactory(url, name, collectionName string) (SubscriberMongo
 	}
 	defer session.Close()
 
-	index := mgo.Index{
-		Key:        []string{"webhookurl"},
-		Unique:     true,
-		DropDups:   true,
-		Background: true,
-		Sparse:     true,
-	}
-
-	err = session.DB(db.Name).C(db.SubscriberCollectionName).EnsureIndex(index)
-	if err != nil {
-		return SubscriberMongoDB{}, err
-	}
-
 	return db, nil
 }
 
 // Add adds a subscriber to the db
-func (db *SubscriberMongoDB) Add(s Subscriber) (int, error) {
+func (db *SubscriberMongoDB) Add(s Subscriber) (string, error) {
 	session, err := mgo.Dial(db.URL)
 	if err != nil {
-		return -1, err
+		return "", err
 	}
 	defer session.Close()
 
+	s.ID = bson.NewObjectId()
 	err = session.DB(db.Name).C(db.SubscriberCollectionName).Insert(s)
 	if err != nil {
-		return -1, err
+		return "", err
 	}
-	return 923, nil
+
+	fmt.Println("id: ", s.ID.Hex())
+
+	return s.ID.Hex(), nil
 }
 
 // Remove subscriber with id. Err if not found
-func (db *SubscriberMongoDB) Remove(id int) error {
+func (db *SubscriberMongoDB) Remove(id string) error {
 	session, err := mgo.Dial(db.URL)
 	if err != nil {
 		return err
 	}
 	defer session.Close()
 
+	err = session.DB(db.Name).C(db.SubscriberCollectionName).RemoveId(id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 // Count returns the number of subscribers in the db
 func (db *SubscriberMongoDB) Count() (int, error) {
-	return 923, nil
+	session, err := mgo.Dial(db.URL)
+	if err != nil {
+		return 923, err
+	}
+	defer session.Close()
+
+	count, err := session.DB(db.Name).C(db.SubscriberCollectionName).Count()
+	if err != nil {
+		return 923, err
+	}
+
+	return count, nil
 }
 
 // Get gets subscriber with id
-func (db *SubscriberMongoDB) Get(id int) (Subscriber, error) {
+func (db *SubscriberMongoDB) Get(id string) (Subscriber, error) {
 
 	session, err := mgo.Dial(db.URL)
 	if err != nil {
@@ -80,9 +88,8 @@ func (db *SubscriberMongoDB) Get(id int) (Subscriber, error) {
 	defer session.Close()
 
 	var sub Subscriber
-	err = session.DB(db.Name).C(db.SubscriberCollectionName).FindId(id).One(&sub)
+	err = session.DB(db.Name).C(db.SubscriberCollectionName).FindId(bson.ObjectIdHex(id)).One(&sub)
 	if err != nil {
-		fmt.Println(err.Error())
 		return Subscriber{}, err
 	}
 	return sub, nil
