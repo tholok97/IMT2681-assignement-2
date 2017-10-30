@@ -58,7 +58,7 @@ func getJSON(url string) ([]byte, error) {
 func getENV(name string) string {
 	ret := os.Getenv(name)
 	if ret == "" {
-		panic("Missing env variable: " + ret)
+		panic("Missing env variable: " + name)
 	}
 	fmt.Println("Read env ", name, " = ", ret)
 	return ret
