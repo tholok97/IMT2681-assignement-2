@@ -15,7 +15,7 @@ func main() {
 	schSecond := getIntENV("SCHEDULE_SECOND")
 	fixerIOURL := getENV("FIXER_IO_URL")
 	mongoDBURL := getENV("MONGO_DB_URL")
-	mongoDBDatabaseName := getENV("MONGO_DB_CURRENCY_DATABASE_NAME")
+	mongoDBDatabaseName := getENV("MONGO_DB_DATABASE_NAME")
 
 	// set up db
 	db := VolatileSubscriberDBFactory()
