@@ -1,5 +1,5 @@
 {
-	"ImportPath": "imt2681/assignement_2/cmd/subscriberWebAPI",
+	"ImportPath": "IMT2681-assignement_2/cmd/subscriberWebAPI",
 	"GoVersion": "go1.8",
 	"GodepVersion": "v79",
 	"Deps": [
