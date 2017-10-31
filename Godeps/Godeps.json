@@ -1,7 +1,10 @@
 {
-	"ImportPath": "IMT2681-assignement_2/cmd/subscriberWebAPI",
+	"ImportPath": "github.com/tholok97/IMT2681-assignement-2",
 	"GoVersion": "go1.8",
 	"GodepVersion": "v79",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "gopkg.in/mgo.v2",
