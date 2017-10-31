@@ -29,6 +29,7 @@ func SubscriberMongoDBFactory(url, name string) (SubscriberMongoDB, error) {
 
 // Add adds a subscriber to the db
 func (db *SubscriberMongoDB) Add(s Subscriber) (string, error) {
+
 	session, err := mgo.Dial(db.URL)
 	if err != nil {
 		return "", err
@@ -47,12 +48,14 @@ func (db *SubscriberMongoDB) Add(s Subscriber) (string, error) {
 
 // Remove subscriber with id. Err if not found
 func (db *SubscriberMongoDB) Remove(id string) error {
+
 	session, err := mgo.Dial(db.URL)
 	if err != nil {
 		return err
 	}
 	defer session.Close()
 
+	// (id in hex -> convert)
 	err = session.DB(db.Name).C(db.SubscriberCollectionName).RemoveId(bson.ObjectIdHex(id))
 	if err != nil {
 		return err
@@ -63,6 +66,7 @@ func (db *SubscriberMongoDB) Remove(id string) error {
 
 // Count returns the number of subscribers in the db
 func (db *SubscriberMongoDB) Count() (int, error) {
+
 	session, err := mgo.Dial(db.URL)
 	if err != nil {
 		return 923, err
@@ -86,6 +90,7 @@ func (db *SubscriberMongoDB) Get(id string) (Subscriber, error) {
 	}
 	defer session.Close()
 
+	// (id is in hex -> convert)
 	var sub Subscriber
 	err = session.DB(db.Name).C(db.SubscriberCollectionName).FindId(bson.ObjectIdHex(id)).One(&sub)
 	if err != nil {
