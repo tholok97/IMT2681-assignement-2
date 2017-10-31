@@ -56,7 +56,7 @@ func TestSubscriberHandler_handleSubscriberRequest_POST(t *testing.T) {
 	handler := SubscriberHandlerFactory(&db, nil)
 
 	// instantiate mock HTTP server
-	ts := httptest.NewServer(http.HandlerFunc(handler.handleSubscriberRequest))
+	ts := httptest.NewServer(http.HandlerFunc(handler.HandleSubscriberRequest))
 	defer ts.Close()
 
 	// fully valid
@@ -127,7 +127,7 @@ func TestSubscriberHandler_handleSubscriberRequest_GET(t *testing.T) {
 	handler := SubscriberHandlerFactory(&db, nil)
 
 	// instantiate mock HTTP server
-	ts := httptest.NewServer(http.HandlerFunc(handler.handleSubscriberRequest))
+	ts := httptest.NewServer(http.HandlerFunc(handler.HandleSubscriberRequest))
 	defer ts.Close()
 
 	// test ids
@@ -176,7 +176,7 @@ func TestSubscriberHandler_handleSubscriberRequest_DELETE(t *testing.T) {
 	handler := SubscriberHandlerFactory(&db, nil)
 
 	// instantiate mock HTTP server
-	ts := httptest.NewServer(http.HandlerFunc(handler.handleSubscriberRequest))
+	ts := httptest.NewServer(http.HandlerFunc(handler.HandleSubscriberRequest))
 	defer ts.Close()
 
 	// test ids
@@ -212,7 +212,7 @@ func TestSubscriberHandler_handleSubscriberRequest_DEFAULT(t *testing.T) {
 	handler := SubscriberHandlerFactory(&db, nil)
 
 	// instantiate mock HTTP server
-	ts := httptest.NewServer(http.HandlerFunc(handler.handleSubscriberRequest))
+	ts := httptest.NewServer(http.HandlerFunc(handler.HandleSubscriberRequest))
 	defer ts.Close()
 
 	// asssert that not implemented is returned for PATCH method (not supported)
@@ -227,7 +227,7 @@ func TestSubscriberHandler_handleLatest(t *testing.T) {
 	handler := SubscriberHandlerFactory(nil, &monitor)
 
 	// instantiate mock HTTP server
-	ts := httptest.NewServer(http.HandlerFunc(handler.handleLatest))
+	ts := httptest.NewServer(http.HandlerFunc(handler.HandleLatest))
 	defer ts.Close()
 
 	// TODO add stuff for testing invalid currencies, error handling, valid
@@ -299,7 +299,7 @@ func TestSubscriberHandler_handleAverage(t *testing.T) {
 	handler := SubscriberHandlerFactory(nil, &monitor)
 
 	// instantiate mock HTTP server
-	ts := httptest.NewServer(http.HandlerFunc(handler.handleAverage))
+	ts := httptest.NewServer(http.HandlerFunc(handler.HandleAverage))
 	defer ts.Close()
 
 	// TODO add stuff for testing invalid currencies, error handling, valid
