@@ -21,4 +21,4 @@ type CurrencyMonitor interface {
 // error variables (so users of the interfaces can react to them)
 var errInvalidCurrency = errors.New("currency used is not valid")
 var errNotFound = errors.New("subscriber not found")
-var errNoId = errors.New("no id given to search in mongodb")
+var errInvalidID = errors.New("no id given to search in mongodb")

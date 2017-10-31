@@ -55,9 +55,9 @@ func (db *SubscriberMongoDB) Remove(id string) error {
 	}
 	defer session.Close()
 
-	// if no id, fail
-	if id == "" {
-		return errNoId
+	// if invalid id, fail
+	if !bson.IsObjectIdHex(id) {
+		return errInvalidID
 	}
 
 	// (id in hex -> convert)
@@ -95,9 +95,9 @@ func (db *SubscriberMongoDB) Get(id string) (Subscriber, error) {
 	}
 	defer session.Close()
 
-	// if no id, fail
-	if id == "" {
-		return Subscriber{}, errNoId
+	// if invalid id, fail
+	if !bson.IsObjectIdHex(id) {
+		return Subscriber{}, errInvalidID
 	}
 
 	// (id is in hex -> convert)
