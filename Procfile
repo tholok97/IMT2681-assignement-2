@@ -1,1 +1,1 @@
-web: assignement_2
+web: subscriberWebAPI
