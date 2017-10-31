@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"net/http"
+	"time"
 
 	service "github.com/tholok97/IMT2681-assignement-2/currencyWebhookService"
 )
@@ -10,7 +10,9 @@ import (
 func main() {
 
 	// (try to) get the port from heroku config vars
-	port := service.GetENV("PORT")
+	schHour := service.GetIntENV("SCHEDULE_HOUR")
+	schMinute := service.GetIntENV("SCHEDULE_MINUTE")
+	schSecond := service.GetIntENV("SCHEDULE_SECOND")
 	fixerIOURL := service.GetENV("FIXER_IO_URL")
 	mongoDBURL := service.GetENV("MONGO_DB_URL")
 	mongoDBDatabaseName := service.GetENV("MONGO_DB_DATABASE_NAME")
@@ -36,18 +38,22 @@ func main() {
 	// set up handler
 	handler := service.SubscriberHandlerFactory(&db, &monitor)
 
-	// set up handlerfuncs
-	http.HandleFunc("/", handler.HandleSubscriberRequest)
-	http.HandleFunc("/latest", handler.HandleLatest)
-	http.HandleFunc("/average", handler.HandleAverage)
-	http.HandleFunc("/evaluationtrigger", handler.HandleEvaluationTrigger)
+	// update monitor -> notify -> sleep
+	for {
+		fmt.Println("Updating monitor...")
+		err := monitor.Update()
+		if err != nil {
+			fmt.Println("!!! Failed to update monitor (", err.Error(), ")")
+		}
 
-	// start listening on port
-	fmt.Println("Listening on port " + port + "...")
-	err = http.ListenAndServe(":"+port, nil)
+		fmt.Println("Notifying all subscribers...")
+		err = handler.NotifyAll()
+		if err != nil {
+			fmt.Println("!!! Failed to notify all subscribers (", err.Error(), ")")
+		}
 
-	// if we couldn't set up the server, give up
-	if err != nil {
-		panic(err)
+		dur := service.DurUntilClock(schHour, schMinute, schSecond)
+		fmt.Println("Sleeping ", dur, "...")
+		time.Sleep(dur)
 	}
 }

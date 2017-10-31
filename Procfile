@@ -1,1 +1,2 @@
 web: subscriberWebAPI
+worker: currencyMonitor
