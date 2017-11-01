@@ -1,5 +1,7 @@
 # IGNORE PERSONAL FILES --------------------------------------------------------
-#
+
+c.sh
+
 # exclude .env file (contains personal info)
 .env
 account_info.json
