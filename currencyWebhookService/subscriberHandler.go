@@ -1,11 +1,13 @@
 package currencyWebhookService
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 // SubscriberHandler handles requests from clients. It has info on subscribers
@@ -239,8 +241,69 @@ func (handler *SubscriberHandler) NotifyAll() error {
 
 // notify single subscriber
 func (handler *SubscriberHandler) NotifySubscriber(s Subscriber) {
-	// TODO implement notifications
+
+	// log
 	fmt.Println("Notifying ", *s.WebhookURL)
+
+	// calc rate
+	rate, err := handler.Monitor.Latest(*s.BaseCurrency, *s.TargetCurrency)
+	if err != nil {
+		fmt.Println("\tERROR: failed to get latest between ", *s.BaseCurrency,
+			" and ", *s.MinTriggerValue)
+	}
+
+	// log
+	fmt.Println("\tRate: ", rate)
+	fmt.Println("\tMinTriggerValue: ", *s.MinTriggerValue)
+	fmt.Println("\tMaxTriggerValue: ", *s.MaxTriggerValue)
+
+	// should notify?
+	if rate >= *s.MinTriggerValue && rate <= *s.MaxTriggerValue {
+
+		// prepare payload
+		payload := CurrencyPayload{
+			BaseCurrency:    *s.BaseCurrency,
+			TargetCurrency:  *s.TargetCurrency,
+			CurrentRate:     rate,
+			MinTriggerValue: *s.MinTriggerValue,
+			MaxTriggerValue: *s.MaxTriggerValue,
+		}
+
+		// try 3 times to send notification
+		for i := 0; i < 3; i++ {
+
+			// try sending notification
+			err = sendNotification(*s.WebhookURL, payload)
+			if err != nil {
+
+				// failure... sleep to try again if not end of loop
+				fmt.Println("\tdidn't manage to notify: ", err.Error())
+				if i < 3 {
+					time.Sleep(time.Second * 2)
+				}
+			} else {
+
+				// success! break
+				fmt.Println("\tDid notify!")
+				break
+			}
+		}
+	}
+
+	fmt.Println("\tdone trying")
+
+}
+
+func sendNotification(url string, payload CurrencyPayload) error {
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(payload)
+	_, err := http.Post(url, "application/json; charset=utf-8", b)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // utility function for responding with a simple statuscode
