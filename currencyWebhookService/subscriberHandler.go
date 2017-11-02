@@ -24,6 +24,7 @@ func SubscriberHandlerFactory(db SubscriberDB, monitor CurrencyMonitor) Subscrib
 	return handler
 }
 
+// HandleSubscriberRequestPOST handles requests from incomming POSTs about subscribers
 func (handler *SubscriberHandler) HandleSubscriberRequestPOST(res http.ResponseWriter, req *http.Request) {
 
 	// attempt to decode the POST json
@@ -64,6 +65,7 @@ func (handler *SubscriberHandler) HandleSubscriberRequestPOST(res http.ResponseW
 	fmt.Fprint(res, id)
 }
 
+// HandleSubscriberRequestGET handle GETs from subscriber
 func (handler *SubscriberHandler) HandleSubscriberRequestGET(res http.ResponseWriter, req *http.Request) {
 
 	// try to pick out the id from the url
@@ -91,6 +93,7 @@ func (handler *SubscriberHandler) HandleSubscriberRequestGET(res http.ResponseWr
 
 }
 
+// HandleSubscriberRequestDELETE handles incomming DELETEs on subscribers
 func (handler *SubscriberHandler) HandleSubscriberRequestDELETE(res http.ResponseWriter, req *http.Request) {
 
 	// try to pick out the id from the url
@@ -111,7 +114,7 @@ func (handler *SubscriberHandler) HandleSubscriberRequestDELETE(res http.Respons
 	respWithCode(&res, http.StatusOK)
 }
 
-// handle subscriber requests
+// HandleSubscriberRequest handles incomming subscriber requests
 func (handler *SubscriberHandler) HandleSubscriberRequest(res http.ResponseWriter, req *http.Request) {
 
 	// switch on the method of the request
@@ -127,7 +130,7 @@ func (handler *SubscriberHandler) HandleSubscriberRequest(res http.ResponseWrite
 	}
 }
 
-// handle requests about latests data
+// HandleLatest handle requests about latest info
 func (handler *SubscriberHandler) HandleLatest(res http.ResponseWriter, req *http.Request) {
 
 	// ..only supports POST method
@@ -168,7 +171,7 @@ func (handler *SubscriberHandler) HandleLatest(res http.ResponseWriter, req *htt
 	fmt.Fprint(res, rate)
 }
 
-// handle requests about average data
+// HandleAverage handle incomming requests about average info
 func (handler *SubscriberHandler) HandleAverage(res http.ResponseWriter, req *http.Request) {
 
 	// ..only supports POST method
@@ -209,7 +212,7 @@ func (handler *SubscriberHandler) HandleAverage(res http.ResponseWriter, req *ht
 	fmt.Fprint(res, rate)
 }
 
-// handler (for testing and debug mostly) that forces all subscribers to be notfied
+// HandleEvaluationTrigger (for testing and debug mostly) that forces all subscribers to be notfied
 func (handler *SubscriberHandler) HandleEvaluationTrigger(res http.ResponseWriter, req *http.Request) {
 
 	// only GET supported
@@ -227,7 +230,7 @@ func (handler *SubscriberHandler) HandleEvaluationTrigger(res http.ResponseWrite
 	}
 }
 
-// notify all subscribers
+// NotifyAll notifies all
 func (handler *SubscriberHandler) NotifyAll() error {
 	subs, err := handler.db.GetAll()
 	if err != nil {
@@ -239,7 +242,7 @@ func (handler *SubscriberHandler) NotifyAll() error {
 	return nil
 }
 
-// notify single subscriber
+// NotifySubscriber notifies single subscriber
 func (handler *SubscriberHandler) NotifySubscriber(s Subscriber) {
 
 	// log

@@ -54,7 +54,7 @@ func getJSON(url string) ([]byte, error) {
 	return bodyBytes, nil
 }
 
-// get environment variable. If something goes wrong: PANIC
+// GetENV gets environment variable. If something goes wrong: PANIC
 func GetENV(name string) string {
 	ret := os.Getenv(name)
 	if ret == "" {
@@ -64,7 +64,7 @@ func GetENV(name string) string {
 	return ret
 }
 
-// get environment variable as int. If something goes wrong: PANIC
+// GetIntENV gets environment variable as int. If something goes wrong: PANIC
 func GetIntENV(name string) int {
 	ret := GetENV(name)
 	num, err := strconv.Atoi(ret)
@@ -74,7 +74,7 @@ func GetIntENV(name string) int {
 	return num
 }
 
-// calculate duration until next HH:MM:SS
+// DurUntilClock calculates duration until next HH:MM:SS
 func DurUntilClock(hour, minute, second int) time.Duration {
 	t := time.Now()
 
@@ -94,7 +94,7 @@ func DurUntilClock(hour, minute, second int) time.Duration {
 	return d
 }
 
-// calculate duration until time is when
+// DurUntilTime calculate duration until time is when
 func DurUntilTime(when time.Time) time.Duration {
 	return when.Sub(time.Now())
 }
