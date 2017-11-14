@@ -230,6 +230,30 @@ func (handler *SubscriberHandler) HandleEvaluationTrigger(res http.ResponseWrite
 	}
 }
 
+func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req *http.Request) {
+	//DEBUG
+	fmt.Fprint(res, "Dialogflow handler is working")
+	fmt.Println("Dialogflow handler is working")
+	// only POST supported
+	if req.Method != http.MethodPost {
+		respWithCode(&res, http.StatusNotImplemented)
+		return
+	}
+
+	var dialogRequest1 DialogRequest
+	err := json.NewDecoder(req.Body).Decode(&dialogRequest1)
+
+	// if couldn't decode -> bad req
+	if err != nil {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	}
+
+	fmt.Fprint(res, "Base currency: ", dialogRequest1.Results.Parameters.BaseCurrency)
+	fmt.Fprint(res, "Target currency: ", dialogRequest1.Results.Parameters.TargetCurrency)
+
+}
+
 // NotifyAll notifies all
 func (handler *SubscriberHandler) NotifyAll() error {
 	subs, err := handler.db.GetAll()

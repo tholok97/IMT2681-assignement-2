@@ -41,6 +41,7 @@ func main() {
 	http.HandleFunc("/latest", handler.HandleLatest)
 	http.HandleFunc("/average", handler.HandleAverage)
 	http.HandleFunc("/evaluationtrigger", handler.HandleEvaluationTrigger)
+	http.HandleFunc("/dialogFlow", handler.HandleDialogFlow)
 
 	// start listening on port
 	fmt.Println("Listening on port " + port + "...")

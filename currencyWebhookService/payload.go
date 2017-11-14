@@ -13,6 +13,18 @@ type Subscriber struct {
 	MaxTriggerValue *float32      `json:"maxTriggerValue"`
 }
 
+type DialogRequest struct {
+	Results ResultField `json:"result"`
+}
+
+type ResultField struct {
+	Parameters ParameterField `json:"parameters"`
+}
+type ParameterField struct {
+	BaseCurrency   string `json:"baseCurrency"`
+	TargetCurrency string `json:"targetCurrency"`
+}
+
 // CurrencyPayload holds info sent to subscriber
 type CurrencyPayload struct {
 	BaseCurrency    string  `json:"baseCurrency"`
