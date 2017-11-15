@@ -259,6 +259,7 @@ func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req 
 	// TODO insert actual exchange rate
 	respString += "1.45"
 	dialogResponse1.DisplayText = respString
+	dialogResponse1.Speech = respString
 
 	http.Header.Add(res.Header(), "content-type", "application/json")
 	err = json.NewEncoder(res).Encode(dialogResponse1)
