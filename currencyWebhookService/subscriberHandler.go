@@ -230,28 +230,42 @@ func (handler *SubscriberHandler) HandleEvaluationTrigger(res http.ResponseWrite
 	}
 }
 
+// HandleDialogFlow takes request from dialogflow and returns a json with data
 func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req *http.Request) {
-	//DEBUG
-	fmt.Fprint(res, "Dialogflow handler is working")
+	// DEBUG
+	// fmt.Fprint(res, "Dialogflow handler is working")
 	fmt.Println("Dialogflow handler is working")
 	// only POST supported
 	if req.Method != http.MethodPost {
 		respWithCode(&res, http.StatusNotImplemented)
 		return
 	}
-
 	var dialogRequest1 DialogRequest
-	err := json.NewDecoder(req.Body).Decode(&dialogRequest1)
+	var dialogResponse1 DialogResponse
 
+	err := json.NewDecoder(req.Body).Decode(&dialogRequest1)
 	// if couldn't decode -> bad req
 	if err != nil {
 		respWithCode(&res, http.StatusBadRequest)
 		return
 	}
 
-	fmt.Fprint(res, "Base currency: ", dialogRequest1.Results.Parameters.BaseCurrency)
-	fmt.Fprint(res, "Target currency: ", dialogRequest1.Results.Parameters.TargetCurrency)
+	respString := ""
+	respString += "The exchange rate between "
+	respString += dialogRequest1.Results.Parameters.BaseCurrency
+	respString += " and "
+	respString += dialogRequest1.Results.Parameters.TargetCurrency
+	respString += " is: "
+	// TODO insert actual exchange rate
+	respString += "1.45"
+	dialogResponse1.DisplayText = respString
 
+	http.Header.Add(res.Header(), "content-type", "application/json")
+	err = json.NewEncoder(res).Encode(dialogResponse1)
+	if err != nil {
+		respWithCode(&res, http.StatusInternalServerError)
+		return
+	}
 }
 
 // NotifyAll notifies all
