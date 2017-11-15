@@ -255,7 +255,10 @@ func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req 
 		dialogRequest1.Results.Parameters.BaseCurrency,
 		dialogRequest1.Results.Parameters.TargetCurrency)
 
-	if rateErr != nil {
+	if rateErr == errInvalidCurrency {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	} else if rateErr != nil {
 		respWithCode(&res, http.StatusInternalServerError)
 		return
 	}
