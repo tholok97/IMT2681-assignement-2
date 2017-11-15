@@ -16,6 +16,7 @@ type Subscriber struct {
 //DialogResponse contains the response to dialogflow
 type DialogResponse struct {
 	DisplayText string `json:"displayText"`
+	Speech      string `json:"speech"`
 }
 
 //DialogRequest contains the request from dialogflow
