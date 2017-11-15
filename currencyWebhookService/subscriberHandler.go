@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -250,15 +251,25 @@ func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req 
 		return
 	}
 
+	rate, rateErr := handler.Monitor.Latest(
+		dialogRequest1.Results.Parameters.BaseCurrency,
+		dialogRequest1.Results.Parameters.TargetCurrency)
+
+	if rateErr != nil {
+		respWithCode(&res, http.StatusInternalServerError)
+		return
+	}
+	rateStr := strconv.FormatFloat(float64(rate), 'f', 2, 32)
+
 	respString := ""
 	respString += "The exchange rate between "
 	respString += dialogRequest1.Results.Parameters.BaseCurrency
 	respString += " and "
 	respString += dialogRequest1.Results.Parameters.TargetCurrency
 	respString += " is: "
-	// TODO insert actual exchange rate
-	respString += "1.45"
+	respString += rateStr
 	dialogResponse1.DisplayText = respString
+	dialogResponse1.Speech = respString
 
 	http.Header.Add(res.Header(), "content-type", "application/json")
 	err = json.NewEncoder(res).Encode(dialogResponse1)
