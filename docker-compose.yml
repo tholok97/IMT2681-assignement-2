@@ -17,7 +17,9 @@ services:
       - ./.env  
     environment:
       - MONGO_DB_URL=db
-    build: ./cmd/currencyMonitor
+    build: 
+        context: ./
+        dockerfile: ./cmd/currencyMonitor/Dockerfile
     depends_on:
       - db
   db:
