@@ -1,33 +1,38 @@
+# Description of services:
+# - web service handles incoming requests on port 5000
+# - monitor service regularly updates the currency database
+# - db service provides the other services with a mongo database
+
 version: '3'
 
 services:
-  web:
-    env_file:
-      - ./.env  
-    environment:
-      - MONGO_DB_URL=db
-    build: 
-        context: ./
-        dockerfile: ./cmd/subscriberWebAPI/Dockerfile
-    ports:
-      - 5000:5000
-    depends_on:
-      - db
-      - monitor
-  monitor:
-    env_file:
-      - ./.env  
-    environment:
-      - MONGO_DB_URL=db
-    build: 
-        context: ./
-        dockerfile: ./cmd/currencyMonitor/Dockerfile
-    depends_on:
-      - db
-  db:
-    image: "mongo:latest"
-    volumes:
-      - db-data:/data/db
+    web:
+        env_file:
+            - ./.env  
+        environment:
+            - MONGO_DB_URL=db
+        build: 
+            context: ./
+            dockerfile: ./cmd/subscriberWebAPI/Dockerfile
+        ports:
+            - 5000:5000
+        depends_on:
+            - db
+            - monitor
+    monitor:
+        env_file:
+            - ./.env  
+        environment:
+            - MONGO_DB_URL=db
+        build: 
+            context: ./
+            dockerfile: ./cmd/currencyMonitor/Dockerfile
+        depends_on:
+            - db
+    db:
+        image: "mongo:latest"
+        volumes:
+            - db-data:/data/db
 
 volumes:
-  db-data:
+    db-data:
