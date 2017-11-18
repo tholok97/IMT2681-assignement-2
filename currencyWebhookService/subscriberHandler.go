@@ -136,6 +136,7 @@ func (handler *SubscriberHandler) HandleLatest(res http.ResponseWriter, req *htt
 	// ..only supports POST method
 	if req.Method != http.MethodPost {
 		respWithCode(&res, http.StatusNotImplemented)
+		return
 	}
 
 	// attempt to decode the POST json
@@ -177,6 +178,7 @@ func (handler *SubscriberHandler) HandleAverage(res http.ResponseWriter, req *ht
 	// ..only supports POST method
 	if req.Method != http.MethodPost {
 		respWithCode(&res, http.StatusNotImplemented)
+		return
 	}
 
 	// attempt to decode the POST json
@@ -228,6 +230,8 @@ func (handler *SubscriberHandler) HandleEvaluationTrigger(res http.ResponseWrite
 		respWithCode(&res, http.StatusInternalServerError)
 		return
 	}
+
+	respWithCode(&res, http.StatusOK)
 }
 
 // NotifyAll notifies all
