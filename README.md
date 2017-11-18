@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repo contains our group's (Denbestegruppa) solution to assignement 3, as well as my personal solution to assignement 2. The code is written to be run both with Heroku and Docker, and (should) currently be running in Heroku on the link provided below
+This repo contains our group's (*Denbestegruppa*) solution to assignement 3, as well as my personal solution to assignement 2. The code is written to be run both with Heroku and Docker, and *should* currently be running in Heroku on the link provided below
 
 * **Assignement 2 instructions**: [instructions2.md](./instructions2.md)
 * **Assignement 3 instructions**: [instructions3.md](./instructions3.md)
@@ -46,7 +46,7 @@ The command `heroku local` should start running the project locally. If everythi
 
 ## Running with Docker
 
-The command `docker-compose up` should build / fetch the necessary containers, link them and start running the project. See the '**docker-compose.yml**' for details.
+The command `docker-compose up` should build / fetch the necessary containers, link them and start running the project. See '**docker-compose.yml**' for details.
 
 ## Dependencies
 
