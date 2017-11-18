@@ -13,23 +13,23 @@ type Subscriber struct {
 	MaxTriggerValue *float32      `json:"maxTriggerValue"`
 }
 
-//DialogResponse contains the response to dialogflow
+// DialogResponse contains the response to dialogflow
 type DialogResponse struct {
 	DisplayText string `json:"displayText"`
 	Speech      string `json:"speech"`
 }
 
-//DialogRequest contains the request from dialogflow
+// DialogRequest contains the request from dialogflow
 type DialogRequest struct {
 	Results ResultField `json:"result"`
 }
 
-//ResultField contains the ResultField from the dialogflow request
+// ResultField contains the ResultField from the dialogflow request
 type ResultField struct {
 	Parameters ParameterField `json:"parameters"`
 }
 
-//ParameterField contains the ParameterField in the ResultField from the dialogflow request
+// ParameterField contains the ParameterField in the ResultField from the dialogflow request
 type ParameterField struct {
 	BaseCurrency   string `json:"baseCurrency"`
 	TargetCurrency string `json:"targetCurrency"`

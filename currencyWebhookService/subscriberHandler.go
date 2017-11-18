@@ -233,28 +233,31 @@ func (handler *SubscriberHandler) HandleEvaluationTrigger(res http.ResponseWrite
 
 // HandleDialogFlow takes request from dialogflow and returns a json with data
 func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req *http.Request) {
-	// DEBUG
-	// fmt.Fprint(res, "Dialogflow handler is working")
-	fmt.Println("Dialogflow handler is working")
+
+	fmt.Println("Handling dialogflow request")
+
 	// only POST supported
 	if req.Method != http.MethodPost {
 		respWithCode(&res, http.StatusNotImplemented)
 		return
 	}
-	var dialogRequest1 DialogRequest
-	var dialogResponse1 DialogResponse
 
-	err := json.NewDecoder(req.Body).Decode(&dialogRequest1)
+	// decode incomming json
+	var dialogRequest DialogRequest
+	err := json.NewDecoder(req.Body).Decode(&dialogRequest)
+
 	// if couldn't decode -> bad req
 	if err != nil {
 		respWithCode(&res, http.StatusBadRequest)
 		return
 	}
 
+	// (try and) get requested rate
 	rate, rateErr := handler.Monitor.Latest(
-		dialogRequest1.Results.Parameters.BaseCurrency,
-		dialogRequest1.Results.Parameters.TargetCurrency)
+		dialogRequest.Results.Parameters.BaseCurrency,
+		dialogRequest.Results.Parameters.TargetCurrency)
 
+	// handle errors
 	if rateErr == errInvalidCurrency {
 		respWithCode(&res, http.StatusBadRequest)
 		return
@@ -262,20 +265,31 @@ func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req 
 		respWithCode(&res, http.StatusInternalServerError)
 		return
 	}
+
+	// convert rate to string (to be added in response to dialogFlow)
 	rateStr := strconv.FormatFloat(float64(rate), 'f', 2, 32)
 
+	// build response string
 	respString := ""
 	respString += "The exchange rate between "
-	respString += dialogRequest1.Results.Parameters.BaseCurrency
+	respString += dialogRequest.Results.Parameters.BaseCurrency
 	respString += " and "
-	respString += dialogRequest1.Results.Parameters.TargetCurrency
+	respString += dialogRequest.Results.Parameters.TargetCurrency
 	respString += " is: "
 	respString += rateStr
-	dialogResponse1.DisplayText = respString
-	dialogResponse1.Speech = respString
 
+	// prepare response payload
+	var dialogResponse DialogResponse
+	dialogResponse.DisplayText = respString
+	dialogResponse.Speech = respString
+
+	// set JSON in response header
 	http.Header.Add(res.Header(), "content-type", "application/json")
-	err = json.NewEncoder(res).Encode(dialogResponse1)
+
+	// send payload as reponse
+	err = json.NewEncoder(res).Encode(dialogResponse)
+
+	// if anything went wrong -> internal server error (our fault)
 	if err != nil {
 		respWithCode(&res, http.StatusInternalServerError)
 		return
