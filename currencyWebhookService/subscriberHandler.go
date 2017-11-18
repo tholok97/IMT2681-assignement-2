@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -232,6 +233,71 @@ func (handler *SubscriberHandler) HandleEvaluationTrigger(res http.ResponseWrite
 	}
 
 	respWithCode(&res, http.StatusOK)
+}
+
+// HandleDialogFlow takes request from dialogflow and returns a json with data
+func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req *http.Request) {
+
+	fmt.Println("Handling dialogflow request")
+
+	// only POST supported
+	if req.Method != http.MethodPost {
+		respWithCode(&res, http.StatusNotImplemented)
+		return
+	}
+
+	// decode incomming json
+	var dialogRequest DialogRequest
+	err := json.NewDecoder(req.Body).Decode(&dialogRequest)
+
+	// if couldn't decode -> bad req
+	if err != nil {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	}
+
+	// (try and) get requested rate
+	rate, rateErr := handler.Monitor.Latest(
+		dialogRequest.Results.Parameters.BaseCurrency,
+		dialogRequest.Results.Parameters.TargetCurrency)
+
+	// handle errors
+	if rateErr == errInvalidCurrency {
+		respWithCode(&res, http.StatusBadRequest)
+		return
+	} else if rateErr != nil {
+		respWithCode(&res, http.StatusInternalServerError)
+		return
+	}
+
+	// convert rate to string (to be added in response to dialogFlow)
+	rateStr := strconv.FormatFloat(float64(rate), 'f', 2, 32)
+
+	// build response string
+	respString := ""
+	respString += "The exchange rate between "
+	respString += dialogRequest.Results.Parameters.BaseCurrency
+	respString += " and "
+	respString += dialogRequest.Results.Parameters.TargetCurrency
+	respString += " is: "
+	respString += rateStr
+
+	// prepare response payload
+	var dialogResponse DialogResponse
+	dialogResponse.DisplayText = respString
+	dialogResponse.Speech = respString
+
+	// set JSON in response header
+	http.Header.Add(res.Header(), "content-type", "application/json")
+
+	// send payload as reponse
+	err = json.NewEncoder(res).Encode(dialogResponse)
+
+	// if anything went wrong -> internal server error (our fault)
+	if err != nil {
+		respWithCode(&res, http.StatusInternalServerError)
+		return
+	}
 }
 
 // NotifyAll notifies all
