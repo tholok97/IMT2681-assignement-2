@@ -2,11 +2,12 @@
 
 ## Introduction
 
-This repo contains our group's (*Denbestegruppa*) solution to assignement 3, as well as my personal solution to assignement 2. The code is written to be run both with Heroku and Docker, and *should* currently be running in Heroku on the link provided below
+This repo contains our group's (*Denbestegruppa*) solution to assignement 3, as well as my personal solution to assignement 2. The code is written to be run both with Heroku and Docker, and *should* currently be accessible through the links below.
 
 * **Assignement 2 instructions**: [instructions2.md](./instructions2.md)
 * **Assignement 3 instructions**: [instructions3.md](./instructions3.md)
-* **The service**: <https://imt2681-assignement-2.herokuapp.com/>
+* **The service running on Heroku**: <https://imt2681-assignement-2.herokuapp.com/>
+* **The service running in containers using Docker**: <95.85.19.197:5000>
 
 *(This repo is WIP. Explanation and usage-examples will be added as the repo matures)*
 
