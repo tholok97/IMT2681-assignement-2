@@ -7,13 +7,13 @@ This repo contains our group's (*Denbestegruppa*) solution to assignement 3, as 
 * **Assignement 2 instructions**: [instructions2.md](./instructions2.md)
 * **Assignement 3 instructions**: [instructions3.md](./instructions3.md)
 * **The service running on Heroku**: <https://imt2681-assignement-2.herokuapp.com/>
-* **The service running in containers using Docker**: <95.85.19.197:5000>
+* **The service running in containers using Docker**: <http://95.85.19.197:5000>
 
 *(This repo is WIP. Explanation and usage-examples will be added as the repo matures)*
 
 ## Installation
 
-1. Get the repo onto your system with `go get -d github.com/tholok97/IMT2681-assignement-2/`. (-d tells go get to not try and build anything).
+1. Get the repo onto your system with `go get github.com/tholok97/IMT2681-assignement-2-and-3/`. You might get a message telling you no buildable source files were found. This is fine.
 2. Install the repo with `go install ./cmd/subscriberWebAPI/ && go install ./cmd/currencyMonitor/`.
 3. To run the repo with Heroku / Docker you need to supply your own '.env' file. Make a file called '**.env**' that looks like this: 
 
