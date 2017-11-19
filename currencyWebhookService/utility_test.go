@@ -1,8 +1,11 @@
 package currencyWebhookService
 
-import "testing"
-import "encoding/json"
-import "reflect"
+import (
+	"encoding/json"
+	"reflect"
+	"testing"
+	"time"
+)
 
 type faker struct {
 	payload FixerIOPayload
@@ -39,4 +42,34 @@ func TestFetchFixerIO(t *testing.T) {
 		t.Error("fetch returned wrong payload", data)
 	}
 
+}
+
+func TestDurUntilClock(t *testing.T) {
+
+	now := time.Now()
+
+	duration := DurUntilClock(
+		now,
+		now.Add(time.Hour).Hour(),
+		now.Minute(),
+		now.Second(),
+	)
+
+	// check that the function was reasonably accurate
+	// (BAD.. but oh well)
+	if duration.Minutes() < 59 || duration.Hours() == 1 {
+		t.Error("duration until one hour from now isn't one hour?? (is ", duration, ")")
+	}
+}
+
+func TestDurUntilTime(t *testing.T) {
+
+	now := time.Now()
+	duration := DurUntilTime(now, now.Add(time.Hour))
+
+	// check that the function was reasonably accurate
+	// (BAD.. but oh well)
+	if duration.Minutes() < 59 || duration.Hours() != 1 {
+		t.Error("duration until one hour from now isn't one hour?? (is ", duration, ")")
+	}
 }

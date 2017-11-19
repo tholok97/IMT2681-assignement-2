@@ -26,13 +26,6 @@ func fetchFixerIO(url string, jsonGetter func(url string) ([]byte, error)) (Fixe
 	return payload, err
 }
 
-// FixerIOPayload contains response from FixerIO
-type FixerIOPayload struct {
-	Base  string             `json:"base"`
-	Date  string             `json:"date"`
-	Rates map[string]float32 `json:"rates"`
-}
-
 // gets json as []byte from a given url
 func getJSON(url string) ([]byte, error) {
 
@@ -75,26 +68,25 @@ func GetIntENV(name string) int {
 }
 
 // DurUntilClock calculates duration until next HH:MM:SS
-func DurUntilClock(hour, minute, second int) time.Duration {
-	t := time.Now()
+func DurUntilClock(now time.Time, hour, minute, second int) time.Duration {
 
 	// the time this HH:MM:SS is happening
-	when := time.Date(t.Year(), t.Month(), t.Day(), hour,
-		minute, second, 0, t.Location())
+	when := time.Date(now.Year(), now.Month(), now.Day(), hour,
+		minute, second, 0, now.Location())
 
 	// d is the time until next such time
-	d := when.Sub(t)
+	d := when.Sub(now)
 
 	// if duration is negative, add a day
 	if d < 0 {
 		when = when.Add(24 * time.Hour)
-		d = when.Sub(t)
+		d = when.Sub(now)
 	}
 
 	return d
 }
 
 // DurUntilTime calculate duration until time is when
-func DurUntilTime(when time.Time) time.Duration {
-	return when.Sub(time.Now())
+func DurUntilTime(now, when time.Time) time.Duration {
+	return when.Sub(now)
 }

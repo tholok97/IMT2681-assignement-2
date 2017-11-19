@@ -44,6 +44,13 @@ type CurrencyPayload struct {
 	MaxTriggerValue float32 `json:"maxTriggerValue"`
 }
 
+// FixerIOPayload contains response from FixerIO
+type FixerIOPayload struct {
+	Base  string             `json:"base"`
+	Date  string             `json:"date"`
+	Rates map[string]float32 `json:"rates"`
+}
+
 // CurrencyRequest holds info received from the user during basic currency
 // requests
 // (fields are pointers to make validation of incomming requests trivial)

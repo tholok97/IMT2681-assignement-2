@@ -52,7 +52,7 @@ func main() {
 			fmt.Println("!!! Failed to notify all subscribers (", err.Error(), ")")
 		}
 
-		dur := service.DurUntilClock(schHour, schMinute, schSecond)
+		dur := service.DurUntilClock(time.Now(), schHour, schMinute, schSecond)
 		fmt.Println("Sleeping ", dur, "...")
 		time.Sleep(dur)
 		fmt.Println("Done sleeping!")
