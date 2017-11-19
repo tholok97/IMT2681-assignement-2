@@ -13,7 +13,7 @@ This repo contains our group's (*Denbestegruppa*) solution to assignement 3, as 
 
 ## Installation
 
-1. Get the repo onto your system with `go get -d github.com/tholok97/IMT2681-assignement-2/`. (-d tells go get to not try and build anything).
+1. Get the repo onto your system with `go get github.com/tholok97/IMT2681-assignement-2-and-3/`. You might get a message telling you no buildable source files were found. This is fine.
 2. Install the repo with `go install ./cmd/subscriberWebAPI/ && go install ./cmd/currencyMonitor/`.
 3. To run the repo with Heroku / Docker you need to supply your own '.env' file. Make a file called '**.env**' that looks like this: 
 
