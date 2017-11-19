@@ -22,7 +22,7 @@ type FixerIOStorage struct {
 }
 
 // Update the mongodb database by fetching data from url
-func (fios *FixerIOStorage) Update() error {
+func (fios *FixerIOStorage) Update(jsonGetter func(url string) ([]byte, error)) error {
 
 	// delete old entry
 	session, err := mgo.Dial(fios.DatabaseURL)
@@ -36,7 +36,7 @@ func (fios *FixerIOStorage) Update() error {
 	// UPDATE LATEST
 
 	// get payload
-	payload, err := fetchFixerIO(fios.FixerIOURL+"/latest?base=EUR", getJSON)
+	payload, err := fetchFixerIO(fios.FixerIOURL+"/latest?base=EUR", jsonGetter)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (fios *FixerIOStorage) Update() error {
 	}
 
 	// UPDATE AVERAGE
-	average, err := generateAverage(fios.FixerIOURL)
+	average, err := generateAverage(fios.FixerIOURL, jsonGetter)
 	if err != nil {
 		return err
 	}
@@ -82,9 +82,9 @@ func (fios *FixerIOStorage) Update() error {
 	return nil
 }
 
-func generateAverage(url string) (map[string]float32, error) {
+func generateAverage(url string, jsonGetter func(url string) ([]byte, error)) (map[string]float32, error) {
 
-	payload, err := fetchFixerIO(url+"/latest?base=EUR", getJSON)
+	payload, err := fetchFixerIO(url+"/latest?base=EUR", jsonGetter)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func generateAverage(url string) (map[string]float32, error) {
 		t = t.AddDate(0, 0, -1)
 		date := t.Format("2006-01-02")
 
-		payload, err := fetchFixerIO(url+"/"+date+"?base=EUR", getJSON)
+		payload, err := fetchFixerIO(url+"/"+date+"?base=EUR", jsonGetter)
 		if err != nil {
 			return nil, err
 		}

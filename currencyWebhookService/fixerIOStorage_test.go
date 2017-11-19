@@ -1,10 +1,51 @@
 package currencyWebhookService
 
 import (
+	"errors"
 	"testing"
 
 	mgo "gopkg.in/mgo.v2"
 )
+
+func TestFixerIOUpdate(t *testing.T) {
+
+	payload := FixerIOPayload{
+		Base: "EUR", Date: "2014-03-04",
+		Rates: map[string]float32{"NOK": 9.4, "USD": 1.4},
+	}
+
+	faker := faker{payload: payload, err: errors.New("test error")}
+
+	// prepare db
+	fios := FixerIOStorage{
+		DatabaseURL:    "jlskdjfdksj::::",
+		DatabaseName:   "test",
+		CollectionName: "fiosTest",
+		FixerIOURL:     "",
+	}
+
+	var err error
+
+	err = fios.Update(faker.fakeGetter)
+	if err == nil {
+		t.Error("expected error with bad DatabaseURL")
+		return
+	}
+
+	fios.DatabaseURL = "mongodb://localhost"
+	err = fios.Update(faker.fakeGetter)
+	if err == nil {
+		t.Error("expected error with no fixerio URL")
+		return
+	}
+
+	faker.err = nil
+	err = fios.Update(faker.fakeGetter)
+	if err != nil {
+		t.Error("didn't expect error. err: ", err.Error())
+		return
+	}
+}
 
 func TestFixerIOGetLatest(t *testing.T) {
 
