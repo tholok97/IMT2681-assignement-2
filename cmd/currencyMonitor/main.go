@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	service "github.com/tholok97/IMT2681-assignement-2/currencyWebhookService"
+	service "github.com/tholok97/IMT2681-assignement-2-and-3/currencyWebhookService"
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 		CollectionName: "currencies",
 		FixerIOURL:     fixerIOURL,
 	}
-	err = monitor.Update()
+	err = monitor.Update(service.GetJSON)
 	if err != nil {
 		panic("couldn't first-time-update monitor: " + err.Error())
 	}
@@ -41,7 +41,7 @@ func main() {
 	// update monitor -> notify -> sleep
 	for {
 		fmt.Println("Updating monitor...")
-		err := monitor.Update()
+		err := monitor.Update(service.GetJSON)
 		if err != nil {
 			fmt.Println("!!! Failed to update monitor (", err.Error(), ")")
 		}

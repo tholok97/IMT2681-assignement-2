@@ -11,12 +11,12 @@ RUN apt-get update && apt-get -y upgrade
 WORKDIR $GOPATH
 
 # copy over relevant files from the LOCAL repository
-COPY ./cmd/currencyMonitor ./src/github.com/tholok97/IMT2681-assignement-2/cmd/currencyMonitor
-COPY ./currencyWebhookService ./src/github.com/tholok97/IMT2681-assignement-2/currencyWebhookService
-COPY ./vendor ./src/github.com/tholok97/IMT2681-assignement-2/vendor
+COPY ./cmd/currencyMonitor ./src/github.com/tholok97/IMT2681-assignement-2-and-3/cmd/currencyMonitor
+COPY ./currencyWebhookService ./src/github.com/tholok97/IMT2681-assignement-2-and-3/currencyWebhookService
+COPY ./vendor ./src/github.com/tholok97/IMT2681-assignement-2-and-3/vendor
 
 # make binary
-RUN go install github.com/tholok97/IMT2681-assignement-2/cmd/currencyMonitor
+RUN go install github.com/tholok97/IMT2681-assignement-2-and-3/cmd/currencyMonitor
 
 # run binary
 CMD ["./bin/currencyMonitor"]

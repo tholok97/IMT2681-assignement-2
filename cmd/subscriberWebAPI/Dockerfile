@@ -11,12 +11,12 @@ RUN apt-get update && apt-get -y upgrade
 WORKDIR $GOPATH
 
 # copy over relevant files from the LOCAL repository
-COPY ./cmd/subscriberWebAPI ./src/github.com/tholok97/IMT2681-assignement-2/cmd/subscriberWebAPI
-COPY ./currencyWebhookService ./src/github.com/tholok97/IMT2681-assignement-2/currencyWebhookService
-COPY ./vendor ./src/github.com/tholok97/IMT2681-assignement-2/vendor
+COPY ./cmd/subscriberWebAPI ./src/github.com/tholok97/IMT2681-assignement-2-and-3/cmd/subscriberWebAPI
+COPY ./currencyWebhookService ./src/github.com/tholok97/IMT2681-assignement-2-and-3/currencyWebhookService
+COPY ./vendor ./src/github.com/tholok97/IMT2681-assignement-2-and-3/vendor
 
 # make binary
-RUN go install github.com/tholok97/IMT2681-assignement-2/cmd/subscriberWebAPI
+RUN go install github.com/tholok97/IMT2681-assignement-2-and-3/cmd/subscriberWebAPI
 
 # run binary
 CMD ["./bin/subscriberWebAPI"]

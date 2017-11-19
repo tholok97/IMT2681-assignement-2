@@ -13,7 +13,7 @@ type SubscriberDB interface {
 
 // CurrencyMonitor defines how something that monitors currency behaves
 type CurrencyMonitor interface {
-	Update() error
+	Update(func(string) ([]byte, error)) error
 	Latest(curr1, curr2 string) (float32, error)
 	Average(curr1, curr2 string) (float32, error)
 }

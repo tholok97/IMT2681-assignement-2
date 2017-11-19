@@ -27,7 +27,7 @@ func fetchFixerIO(url string, jsonGetter func(url string) ([]byte, error)) (Fixe
 }
 
 // gets json as []byte from a given url
-func getJSON(url string) ([]byte, error) {
+func GetJSON(url string) ([]byte, error) {
 
 	// (try to) get response from url
 	resp, getErr := http.Get(url)
