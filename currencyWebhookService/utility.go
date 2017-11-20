@@ -26,7 +26,7 @@ func fetchFixerIO(url string, jsonGetter func(url string) ([]byte, error)) (Fixe
 	return payload, err
 }
 
-// gets json as []byte from a given url
+// GetJSON gets json as []byte from a given url
 func GetJSON(url string) ([]byte, error) {
 
 	// (try to) get response from url
