@@ -33,6 +33,7 @@ type ResultField struct {
 type ParameterField struct {
 	BaseCurrency   string `json:"baseCurrency"`
 	TargetCurrency string `json:"targetCurrency"`
+	Amount         string `json:"amount"`
 }
 
 // CurrencyPayload holds info sent to subscriber
