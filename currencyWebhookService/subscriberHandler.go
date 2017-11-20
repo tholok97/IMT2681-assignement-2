@@ -271,10 +271,11 @@ func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req 
 	}
 
 	//set the amount to be converted
+	amount := 1.0
 	if dialogRequest.Results.Parameters.Amount == "1" {
-		amount, err1 := strconv.ParseFloat(dialogRequest.Results.Parameters.Amount, 32)
+		amount, err = strconv.ParseFloat(dialogRequest.Results.Parameters.Amount, 32)
 		rate = rate * float32(amount)
-		if err1 != nil {
+		if err != nil {
 			respWithCode(&res, http.StatusInternalServerError)
 			return
 		}
@@ -288,7 +289,7 @@ func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req 
 
 	// build response string
 	respString := ""
-	respString += rateStr
+	respString += strconv.FormatFloat(float64(amount), 'f', 2, 32)
 	respString += " "
 	respString += dialogRequest.Results.Parameters.BaseCurrency
 	respString += " is: "
