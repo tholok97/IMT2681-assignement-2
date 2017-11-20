@@ -272,7 +272,7 @@ func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req 
 
 	//set the amount to be converted
 	amount := 1.0
-	if dialogRequest.Results.Parameters.Amount == "1" {
+	if dialogRequest.Results.Parameters.Amount != "" {
 		amount, err = strconv.ParseFloat(dialogRequest.Results.Parameters.Amount, 32)
 		rate = rate * float32(amount)
 		if err != nil {
