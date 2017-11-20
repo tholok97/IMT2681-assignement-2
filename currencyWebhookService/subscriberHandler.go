@@ -279,9 +279,6 @@ func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req 
 			respWithCode(&res, http.StatusInternalServerError)
 			return
 		}
-	} else {
-		respWithCode(&res, http.StatusBadRequest)
-		return
 	}
 
 	// convert rate to string (to be added in response to dialogFlow)
