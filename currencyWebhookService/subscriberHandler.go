@@ -270,17 +270,17 @@ func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req 
 		return
 	}
 
-	// if empty amount field -> bad req
-	if dialogRequest.Results.Parameters.Amount == "" {
-		respWithCode(&res, http.StatusBadRequest)
-		return
-	}
+	// amount to be converted
+	amount := 1.0
 
-	// fetch amount from req JSON. If error converting to float32 -> bad req
-	amount, err := strconv.ParseFloat(dialogRequest.Results.Parameters.Amount, 32)
-	if err != nil {
-		respWithCode(&res, http.StatusBadRequest)
-		return
+	// fetch amount from req JSON (if exists). If error converting
+	// to float32 -> bad req
+	if dialogRequest.Results.Parameters.Amount != "" {
+		amount, err = strconv.ParseFloat(dialogRequest.Results.Parameters.Amount, 32)
+		if err != nil {
+			respWithCode(&res, http.StatusBadRequest)
+			return
+		}
 	}
 
 	// converted is the amount converted to the other currency
