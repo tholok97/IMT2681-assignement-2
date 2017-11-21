@@ -33,7 +33,7 @@ WORKDIR /
 COPY --from=builder /go/src/github.com/tholok97/IMT2681-assignement-2-and-3/cmd/subscriberWebAPI/subscriberWebAPI .
 
 # copy over ca-certificates
-ADD ./ca-certificates.crt /etc/ssl/certs/
+COPY ./ca-certificates.crt /etc/ssl/certs/
 
 # run binary
 CMD ["./subscriberWebAPI"]
