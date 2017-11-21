@@ -1,7 +1,8 @@
 # Dockerfile for currencyMonitor container.
 
+#------------------------------ BUILDER CONTAINER ------------------------------
 
-FROM golang:1.8
+FROM golang:1.8 as builder
 LABEL maintainer="thomahl@stud.ntnu.no"
 
 # update and upgrade for security reasons
@@ -15,8 +16,24 @@ COPY ./cmd/currencyMonitor ./src/github.com/tholok97/IMT2681-assignement-2-and-3
 COPY ./currencyWebhookService ./src/github.com/tholok97/IMT2681-assignement-2-and-3/currencyWebhookService
 COPY ./vendor ./src/github.com/tholok97/IMT2681-assignement-2-and-3/vendor
 
-# make binary
-RUN go install github.com/tholok97/IMT2681-assignement-2-and-3/cmd/currencyMonitor
+# move into the directory where the 'main.go' file is located
+WORKDIR $GOPATH/src/github.com/tholok97/IMT2681-assignement-2-and-3/cmd/currencyMonitor
+
+# create independent binary 
+RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o currencyMonitor
+
+#------------------------------ ACTUAL CONTAINER -------------------------------
+
+FROM scratch
+LABEL maintainer="thomahl@stud.ntnu.no"
+
+WORKDIR /
+
+# copy over binary from builder
+COPY --from=builder /go/src/github.com/tholok97/IMT2681-assignement-2-and-3/cmd/currencyMonitor/currencyMonitor .
+
+# copy over ca-certificates
+ADD ./ca-certificates.crt /etc/ssl/certs/
 
 # run binary
-CMD ["./bin/currencyMonitor"]
+CMD ["./currencyMonitor"]
