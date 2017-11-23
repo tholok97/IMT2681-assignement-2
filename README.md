@@ -7,7 +7,7 @@ This repo contains our group's (*Denbestegruppa*) solution to assignement 3, as 
 * **Assignement 2 instructions**: [instructions2.md](./instructions2.md)
 * **Assignement 3 instructions**: [instructions3.md](./instructions3.md)
 * **The service running on Heroku**: <https://imt2681-assignement-2.herokuapp.com/>
-* **The service running in containers using Docker**: <http://95.85.19.197:5000>
+* ~~**The service running in containers using Docker**: <http://95.85.19.197:5000>~~ (Not running)
 
 *(This repo is WIP. Explanation and usage-examples will be added as the repo matures)*
 
