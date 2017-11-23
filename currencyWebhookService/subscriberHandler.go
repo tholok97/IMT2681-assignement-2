@@ -270,17 +270,35 @@ func (handler *SubscriberHandler) HandleDialogFlow(res http.ResponseWriter, req 
 		return
 	}
 
-	// convert rate to string (to be added in response to dialogFlow)
-	rateStr := strconv.FormatFloat(float64(rate), 'f', 2, 32)
+	// amount to be converted
+	amount := 1.0
+
+	// fetch amount from req JSON (if exists). If error converting
+	// to float32 -> bad req
+	if dialogRequest.Results.Parameters.Amount != "" {
+		amount, err = strconv.ParseFloat(dialogRequest.Results.Parameters.Amount, 32)
+		if err != nil {
+			respWithCode(&res, http.StatusBadRequest)
+			return
+		}
+	}
+
+	// converted is the amount converted to the other currency
+	converted := rate * float32(amount)
+
+	// convert converted to string (to be added in response to dialogFlow)
+	convertedStr := strconv.FormatFloat(float64(converted), 'f', 2, 32)
 
 	// build response string
 	respString := ""
-	respString += "The exchange rate between "
+	respString += strconv.FormatFloat(float64(amount), 'f', 2, 32)
+	respString += " "
 	respString += dialogRequest.Results.Parameters.BaseCurrency
-	respString += " and "
-	respString += dialogRequest.Results.Parameters.TargetCurrency
 	respString += " is: "
-	respString += rateStr
+	respString += convertedStr
+	respString += " "
+	respString += dialogRequest.Results.Parameters.TargetCurrency
+	respString += "."
 
 	// prepare response payload
 	var dialogResponse DialogResponse
